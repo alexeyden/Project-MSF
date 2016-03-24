@@ -1,0 +1,44 @@
+@startuml
+
+left to right direction
+
+actor :Пользователь: as client
+actor :Администратор: as admin
+actor :Сервер: as server
+
+(Авторизация) as (auth)
+(Размещение алгоритма) as (add)
+(Исполнение алгоритма) as (exec)
+(Редактрование алгоритма) as (edit)
+(Удаление алгоритма) as (delete)
+
+(Добавление пользователя) as (user_add)
+(Удаление пользователя) as (user_delete)
+(Редактирование ролей) as (role_edit)
+
+note as note_admin
+  Действия осуществляются
+  напрямую на сервере
+end note
+
+(user_add) .. note_admin
+(user_delete) .. note_admin
+(role_edit) .. note_admin
+
+client -- (auth) : Запрос
+client -- (add) : Запрос
+client -- (exec) : Запрос
+client -- (edit) : Запрос
+client -- (delete) : Запрос
+
+(auth) -- server : Токен
+(add) -- server : Подтверждение
+(exec) -- server : Результат исполнения
+(edit) -- server : Подтверждение
+(delete) -- server : Подтверждение
+
+admin -- (user_add)
+admin -- (user_delete)
+admin -- (role_edit)
+
+@enduml
