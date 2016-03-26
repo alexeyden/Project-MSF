@@ -1,0 +1,153 @@
+@startuml
+
+title Диграмма классов серверного приложения
+
+class Server {
+    HTTP-сервер
+    ..
+    - executor : Executor
+    - storage : Storage
+    --
+    - on_user_authorize(login : String, password : String) : String
+    - on_path_list(path: String) : Dict[]
+    - on_path_fetch(path : String) : Algorithm
+    - on_path_exec(path : String, args : TypedValue[]) : TypedValue
+    - on_path_create(path : String) : TypedValue
+    - on_path_move(src : String, dst : String) : String
+    - on_path_edit(path : String, algorithm : Algorithm) : String
+    - on_path_remove(path : String) : String
+    - handler(request : String) : String
+    --
+    + run(host_mask : String, port : Int)
+}
+
+Server --* Executor
+Server --* Storage
+
+class Storage {
+    База данных (хранилище)
+    ..
+    + users : UserAccess
+    + roles : RoleAccess
+    --
+    + open()
+    + close()
+    + list(path : String) : String[]
+    + move(src : String, dst : String)
+    + remove(path : String) : String[]
+    + file_read(path : String) : Any
+    + file_type(path : String) : FileType
+}
+
+Storage ..> FileType
+Storage --* UserAccess
+Storage --* RoleAccess
+
+enum FileType {
+    Тип файла
+    ..
+    + DIRECTORY
+    + ALGORITHM
+    + LINK
+}
+
+class UserAccess {
+    Доступ к списку пользователей
+    ..
+    + by_login(login : String) : User
+    + create(user : User)
+    + change_password(user : User, new_password : String)
+    + remove(user : User)
+}
+
+UserAccess ..> User
+
+class RoleAccess {
+    Доступ к списку ролей
+    ..
+    + by_owner(user : User) : Role[]
+    + by_path(path : String) : Role
+    + create(role : Role)
+    + save(role : Role)
+    + remove(role : Role)
+}
+
+RoleAccess ..> Role
+
+class Algorithm {
+    Алгоритм
+    ..
+    + input_spec : TypeSpec[]
+    + output_spec : TypeSpec
+    + source : String
+}
+
+Algorithm --* TypeSpec
+
+class Role {
+    Роль
+    ..
+    + users : User[]
+    + owner : User
+    + path : String
+}
+
+Role --o User
+
+class User {
+    Пользователь
+    ..
+    + login : String
+    + password : String
+    + token : String
+    + token_expire : DateTime
+}
+
+class TypedValue {
+    Типизированное значение
+    ..
+    + type : TypeSpec
+    + value : Any
+}
+
+TypedValue --* TypeSpec
+
+class TypeSpec {
+    Описание типа данных
+    ..
+    + type : Type
+    + child : TypeSpec
+}
+
+TypeSpec --* TypeSpec
+TypeSpec --* Type
+
+enum Type {
+    Типы данных
+    ..
+    + INT
+    + REAL
+    + STRING
+    + LIST
+}
+
+abstract class Executor {
+    Исполнитель алгоритмов
+    ..
+    + timeout : Real
+    --
+    + execute(algorithm : Algorithm) : TypedValue
+}
+
+Executor ..> Algorithm
+Executor ..> TypedValue
+
+class SchemeExecutor {
+    Исполнитель программ на Scheme
+    ..
+    + execute(algorithm : Algorithm) : TypedValue
+}
+
+SchemeExecutor --|> Executor
+
+@enduml
