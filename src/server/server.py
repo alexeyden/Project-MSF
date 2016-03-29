@@ -2,6 +2,8 @@
 from aiohttp import web
 from util import jsonrpc
 
+jsonrpc_method = jsonrpc.Dispatcher.remote_method
+
 
 class Server:    
     def __init__(self):
@@ -10,35 +12,35 @@ class Server:
 
         self._dispatcher = jsonrpc.Dispatcher(self)
 
-    @jsonrpc.Dispatcher.remote_method(str, str)
+    @jsonrpc_method(str, str)
     async def user_authorize(self, login, password):
         return "user_authorize"
 
-    @jsonrpc.Dispatcher.remote_method(str)
+    @jsonrpc_method(str)
     async def path_list(self, path):
         return "user_authorize"
 
-    @jsonrpc.Dispatcher.remote_method(str)
+    @jsonrpc_method(str)
     async def path_fetch(self, path):
         return "path_fetch"
 
-    @jsonrpc.Dispatcher.remote_method(str, list)
+    @jsonrpc_method(str, list)
     async def path_exec(self, path, args):
         return "path_exec"
 
-    @jsonrpc.Dispatcher.remote_method(str)
+    @jsonrpc_method(str)
     async def path_create(self, path):
         return "path_create"
 
-    @jsonrpc.Dispatcher.remote_method(str, str)
+    @jsonrpc_method(str, str)
     async def path_move(self, source, dest):
         return "path_move"
 
-    @jsonrpc.Dispatcher.remote_method(str, dict)
+    @jsonrpc_method(str, dict)
     async def path_edit(self, path, alg):
         return "path_edit"
 
-    @jsonrpc.Dispatcher.remote_method(str)
+    @jsonrpc_method(str)
     async def path_remove(self, path):
         return "path_remove"
 
