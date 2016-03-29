@@ -1,20 +1,52 @@
 #!/usr/bin/env python3
 from aiohttp import web
-import json
+from util import jsonrpc
+
 
 class Server:    
     def __init__(self):
         self._app = web.Application()
         self._app.router.add_route('POST', '/api', self._handler)
-        
+
+        self._dispatcher = jsonrpc.Dispatcher(self)
+
+    @jsonrpc.Dispatcher.remote_method(str, str)
+    async def user_authorize(self, login, password):
+        return "user_authorize"
+
+    @jsonrpc.Dispatcher.remote_method(str)
+    async def path_list(self, path):
+        return "user_authorize"
+
+    @jsonrpc.Dispatcher.remote_method(str)
+    async def path_fetch(self, path):
+        return "path_fetch"
+
+    @jsonrpc.Dispatcher.remote_method(str, list)
+    async def path_exec(self, path, args):
+        return "path_exec"
+
+    @jsonrpc.Dispatcher.remote_method(str)
+    async def path_create(self, path):
+        return "path_create"
+
+    @jsonrpc.Dispatcher.remote_method(str, str)
+    async def path_move(self, source, dest):
+        return "path_move"
+
+    @jsonrpc.Dispatcher.remote_method(str, dict)
+    async def path_edit(self, path, alg):
+        return "path_edit"
+
+    @jsonrpc.Dispatcher.remote_method(str)
+    async def path_remove(self, path):
+        return "path_remove"
+
     async def _handler(self, request):
-        print('>> from client: ')
-        print('thingy from {0}'.format(request.match_info.get('name', 'unknown')))
-        obj = await request.json()
-        for k,v in obj.items():
-            print('"{0}" = {1}'.format(k, v))
-        
-        return web.Response(body=json.dumps('thanks').encode('utf-8'))
+        text = await request.text()
+        resp = await self._dispatcher.handle(text)
+
+        return web.Response(body=resp.encode('utf-8'))
     
     def run(self):
         web.run_app(self._app)

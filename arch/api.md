@@ -39,7 +39,7 @@ path_create(path) -> result
 
 Перемещение:
 ```
-path_move(path, new) -> result
+path_move(source, dest) -> result
 ```
 
 Изменение:
@@ -51,3 +51,7 @@ path_edit(path, alg) -> result
 ```
 path_remove(path) -> result
 ```
+## Коды ошибок
+
+Невалидный токен (1)
+
