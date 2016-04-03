@@ -6,7 +6,7 @@ from .exceptions import ConfigError
 
 
 class RoleAccess:
-    def __init__(self, storage, config_path='data/roles.json'):
+    def __init__(self, storage, config_path):
         self.config_path = config_path
         self.storage = storage
         self.roles = dict()
