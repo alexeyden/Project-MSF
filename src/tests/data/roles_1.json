@@ -1,0 +1,5 @@
+{
+  "/user1/A/B/" : ["user2"],
+  "/user2/A/B" : ["user1"],
+  "/user1/B/" : ["user2","user3"]
+}
