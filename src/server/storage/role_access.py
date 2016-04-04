@@ -43,7 +43,16 @@ class RoleAccess:
         ]
 
     async def by_path(self, path):
-        return self.roles.get(path, None)
+        role = self.roles.get(path, None)
+
+        if role is not None:
+            return role
+
+        for role_path, role in self.roles.items():
+            if role_path.endswith('/') and path.startswith(role_path):
+                return role
+
+        return None
 
     async def create(self, role):
         raise NotImplementedError()
