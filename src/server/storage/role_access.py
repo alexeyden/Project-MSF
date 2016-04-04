@@ -36,13 +36,13 @@ class RoleAccess:
 
             self.roles[path] = Role(path, set(users))
 
-    async def by_owner(self, user):
+    def by_owner(self, user):
         return [
             role for path, role in self.roles.items()
             if path.startswith('/{0}/'.format(user))
         ]
 
-    async def by_path(self, path):
+    def by_path(self, path):
         role = self.roles.get(path, None)
 
         if role is not None:
@@ -54,11 +54,11 @@ class RoleAccess:
 
         return None
 
-    async def create(self, role):
+    def create(self, role):
         raise NotImplementedError()
 
-    async def save(self, role):
+    def save(self, role):
         raise NotImplementedError()
 
-    async def remove(self, role):
+    def remove(self, role):
         raise NotImplementedError()

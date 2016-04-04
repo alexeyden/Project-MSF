@@ -35,14 +35,14 @@ class UserAccess:
 
             self.users[login] = user
 
-    async def by_login(self, login):
+    def by_login(self, login):
         return self.users.get(login, None)
 
-    async def create(self, user):
+    def create(self, user):
         raise NotImplementedError()
 
-    async def change_password(self, user, new_password):
+    def change_password(self, user, new_password):
         raise NotImplementedError()
 
-    async def remove(self, user):
+    def remove(self, user):
         raise NotImplementedError()
