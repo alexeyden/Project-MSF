@@ -35,6 +35,9 @@ class UserAccess:
 
             self.users[login] = user
 
+    def all(self):
+        return self.users.values()
+
     def by_login(self, login):
         return self.users.get(login, None)
 
