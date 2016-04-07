@@ -42,7 +42,7 @@ class TestRoleAccess(unittest.TestCase):
         role2 = roles.by_path('/user2/A/B')
         self.assertEqual(role2, self.roles[2])
         role2_1 = roles.by_path('/user2/A/')
-        self.assertEqual(role2, self.roles[3])
+        self.assertEqual(role2_1, self.roles[3])
 
 if __name__ == '__main__':
     unittest.main()
