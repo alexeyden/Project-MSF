@@ -1,3 +1,6 @@
 .idea
 *.pyc
 __pycache__
+src/tests/storage/*
+!src/tests/storage/roles.json
+!src/tests/storage/users.json
