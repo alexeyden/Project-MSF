@@ -16,8 +16,9 @@ from server.algorithm.algorithm import Algorithm
 
 
 class FileInfo:
-    def __init__(self, name, owner, shared, is_directory, can_write, can_read):
+    def __init__(self, name, path, owner, shared, is_directory, can_write, can_read):
         self.name = name
+        self.path = path
         self.owner = owner
         self.shared = shared
         self.is_directory = is_directory
@@ -31,8 +32,8 @@ class Storage:
             self.user = user_login
 
     def __init__(self, storage_path='data'):
-        users_config = os.path.join(storage_path, 'users.conf')
-        roles_config = os.path.join(storage_path, 'roles.conf')
+        users_config = os.path.join(storage_path, 'users.json')
+        roles_config = os.path.join(storage_path, 'roles.json')
 
         self.storage_path = storage_path
 
@@ -68,11 +69,14 @@ class Storage:
         if not os.path.isdir(os.path.join(self.storage_path, path)):
             raise InvalidPathError('Invalid path: not a directory')
 
-        contents = os.listdir(os.path.join(self.storage_path, path))
+        contents = os.listdir(self._path_full(path))
         result = []
 
         for item in contents:
-            if self.exists(os.path.relpath(item, self.storage_path), context):
+            if path == '/' and self.owner(os.path.join(path, item)) is None:
+                continue
+
+            if self.exists(os.path.join(path, item), context):
                 item_path = os.path.join(path, item)
                 result.append(self.file_info(item_path, context))
 
@@ -152,9 +156,10 @@ class Storage:
         if not self.exists(path, context):
             raise NoSuchPathError('No such path', path)
 
-        owner, *parts, name = self._path_split(path)
+        owner, *parts = self._path_split(path)
+        name = parts[-1] if parts != [] else '/'
 
-        is_directory = os.path.isdir(os.path.join(self.storage_path, path))
+        is_directory = os.path.isdir(self._path_full(path))
         is_shared = False
         can_write = True
         can_read = True
@@ -164,6 +169,7 @@ class Storage:
             can_write = False
 
         return FileInfo(name=name,
+                        path=path,
                         owner=owner,
                         shared=is_shared,
                         is_directory=is_directory,
@@ -174,21 +180,23 @@ class Storage:
         if not self.valid(path):
             raise InvalidPathError('Invalid path', path)
 
-        full_path = os.path.join(self.storage_path, path)
-
-        if not os.path.exists(full_path):
+        if not os.path.exists(self._path_full(path)):
             return False
+
+        if path == '/':
+            return True
 
         if context is not None:
             user, *parts = self._path_split(path)
             if user != context.user:
-                roles = self.roles.by_path(path)
-                for role in roles:
-                    if user in role.users:
-                        return True
+                role = self.roles.by_path(path)
+
+                if role and context.user in role.users:
+                    return True
+
                 return False
-        else:
-            return True
+
+        return True
 
     def valid(self, path):
         if path is None:
@@ -199,8 +207,8 @@ class Storage:
 
         parts = self._path_split(path)
 
-        # allowed characters: letters space - ! ( ) [ ]
-        name_re = re.compile('[\w\-!()\[\] ]+')
+        # allowed characters: letters space - ! ( ) [ ] .
+        name_re = re.compile('[\w\-!()\[\] \.]+')
 
         for part in parts:
             if part == '':
@@ -236,3 +244,6 @@ class Storage:
     @staticmethod
     def _path_split(path):
         return [part for part in path.split('/') if part != '']
+
+    def _path_full(self, path, *args):
+        return os.path.join(self.storage_path, path[1:], *args)
