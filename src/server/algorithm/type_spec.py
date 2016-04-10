@@ -38,6 +38,12 @@ class TypeSpec:
 
         return TypeSpec(type_, child)
 
+    def to_dict(self):
+        return dict(
+            type=self.type,
+            child=self.child.to_dict() if self.child else None
+        )
+
 
 class TypedValue:
     def __init__(self, type_, value):

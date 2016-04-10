@@ -37,3 +37,12 @@ class Algorithm:
 
         except json.JSONDecodeError as err:
             raise AlgorithmDecodeError('Invalid JSON', text) from err
+
+    def to_json(self):
+        body = dict(
+            input_spec=[spec.to_dict() for spec in self.input_spec],
+            output_spec=self.output_spec.to_dict(),
+            source=self.source
+        )
+
+        return json.dumps(body)
