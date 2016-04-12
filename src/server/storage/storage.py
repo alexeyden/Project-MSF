@@ -25,7 +25,6 @@ class FileInfo:
         self.can_write = can_write
         self.can_read = can_read
 
-
 class Storage:
     class StorageContext:
         def __init__(self, user_login):
@@ -40,7 +39,7 @@ class Storage:
         self.users = UserAccess(storage=self, config_path=users_config)
         self.roles = RoleAccess(storage=self, config_path=roles_config)
 
-        self._read_pool = ThreadPoolExecutor()
+        self._file_pool = ThreadPoolExecutor()
         self._locked_paths = dict()
 
         self._init_storage()
@@ -66,8 +65,8 @@ class Storage:
         if not self.exists(path, context):
             raise NoSuchPathError('No such path', path)
 
-        if not os.path.isdir(os.path.join(self.storage_path, path)):
-            raise InvalidPathError('Invalid path: not a directory')
+        if not os.path.isdir(self._path_full(path)):
+            raise InvalidPathError('Invalid path: not a directory', path)
 
         contents = os.listdir(self._path_full(path))
         result = []
@@ -93,12 +92,12 @@ class Storage:
         if self.exists(dst, context):
             raise InvalidPathError('Invalid dst path: already exists', dst)
 
+        if dst == '/':
+            raise InvalidPathError('Invalid dst path: dst cannot be root', dst)
+
         dst_user, *dst_parts = self._path_split(dst)
 
-        if len(dst_parts) < 1:
-            raise InvalidPathError('Invalid dst path: dst cannot be root')
-
-        if dst_user != context.user.login:
+        if dst_user != context.user:
             raise InvalidPathError('Invalid dst path: cannot move to '
                                    'another user\'s directory', dst)
 
@@ -109,7 +108,7 @@ class Storage:
         if not info.can_write:
             raise InvalidPathError('Invalid path: Cannot remove shared path', src)
 
-        shutil.move(os.path.join(self.storage_path, src), os.path.join(self.storage_path, dst))
+        shutil.move(self._path_full(src), self._path_full(dst))
 
     async def remove(self, path, context=None):
         if not self.valid(path):
@@ -125,10 +124,39 @@ class Storage:
         if not info.can_write:
             raise InvalidPathError('Invalid path: Cannot remove shared path', path)
 
-        if not len(self._path_split(path)) > 1:
+        if len(self._path_split(path)) < 2:
             raise InvalidPathError('Invalid path: Cannot remove root path', path)
 
-        shutil.rmtree(path)
+        full_path = self._path_full(path)
+
+        if os.path.isdir(full_path):
+            shutil.rmtree(self._path_full(path))
+        else:
+            os.remove(full_path)
+
+    async def create(self, path, content=None, context=None):
+        if not self.valid(path):
+            raise InvalidPathError('Invalid path', path)
+
+        if self.exists(path, context):
+            raise InvalidPathError('Path exists', path)
+
+        user, *parts = self._path_split(path)
+
+        if path == '/' or parts == []:
+            raise InvalidPathError('Invalid path: cannot be root', path)
+
+        if user != context.user:
+            raise InvalidPathError('Invalid path: cannot create inside '
+                                   'another user\'s directory', user)
+
+        await self._await_path(path)
+
+        if content:
+            with open(self._path_full(path), 'w'): pass
+            await self.file_write(path, content, context)
+        else:
+            os.mkdir(self._path_full(path))
 
     async def file_read(self, path, context=None):
         if not self.valid(path):
@@ -137,17 +165,47 @@ class Storage:
         if not self.exists(path, context):
             raise NoSuchPathError('No such path', path)
 
-        if os.path.isdir(os.path.join(self.storage_path, path)):
+        if os.path.isdir(self._path_full(path)):
             raise NoSuchPathError('Path points to directory, not a file', path)
 
-        with open(os.path.join(self.storage_path, path), 'r') as f:
+        with open(self._path_full(path), 'r') as f:
             loop = asyncio.get_event_loop()
-            task = asyncio.ensure_future(loop.run_in_executor(self._read_pool, f.read))
+            coro = loop.run_in_executor(self._file_pool, f.read)
+            task = asyncio.ensure_future(coro)
 
             with self._lock_path(path, task):
                 text = await task
 
         return Algorithm.from_json(text)
+
+    async def file_write(self, path, content, context=None):
+        if not self.valid(path):
+            raise InvalidPathError('Invalid path', path)
+
+        if not self.exists(path, context):
+            raise NoSuchPathError('No such path', path)
+
+        if os.path.isdir(self._path_full(path)):
+            raise NoSuchPathError('Path points to directory, not a file', path)
+
+        await self._await_path(path)
+
+        info = self.file_info(path, context)
+
+        if not info.can_write:
+            raise InvalidPathError('Invalid path: Cannot write to shared file', path)
+
+        with open(self._path_full(path), 'wb') as f:
+            loop = asyncio.get_event_loop()
+
+            def write_algorithm():
+                f.write(content.to_json().encode('utf-8'))
+
+            coro = loop.run_in_executor(self._file_pool, write_algorithm)
+            task = asyncio.ensure_future(coro)
+
+            with self._lock_path(path, task):
+                await task
 
     def file_info(self, path, context=None):
         if not self.valid(path):
@@ -166,7 +224,7 @@ class Storage:
 
         if context is not None:
             is_shared = owner != context.user
-            can_write = False
+            can_write = not is_shared
 
         return FileInfo(name=name,
                         path=path,
@@ -223,7 +281,7 @@ class Storage:
         items = os.listdir(self.storage_path)
 
         for user in self.users.all():
-            if not user.login in items:
+            if user.login not in items:
                 os.mkdir(os.path.join(self.storage_path, user.login))
 
     @contextmanager
@@ -238,6 +296,8 @@ class Storage:
             self._locked_paths.pop(path)
 
     async def _await_path(self, path):
+        # FIXME: check subpaths
+
         if path in self._locked_paths:
             await self._locked_paths.get(path)
 
