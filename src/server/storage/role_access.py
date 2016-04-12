@@ -56,7 +56,6 @@ class RoleAccess:
                 if role_path.startswith(path):
                     return role
 
-
         return None
 
     def create(self, role):
