@@ -10,7 +10,7 @@ class TypeSpec:
     PRIMITIVE_TYPES = [INT, REAL, STRING]
     COMPOSITE_TYPES = [LIST]
 
-    def __init__(self, type_, child):
+    def __init__(self, type_, child=None):
         self.type = type_
         self.child = child
 
