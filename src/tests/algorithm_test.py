@@ -2,9 +2,9 @@
 import unittest
 import json
 
-from server.algorithm.exceptions import *
-from server.algorithm.type_spec import *
-from server.algorithm.algorithm import *
+from algorithm.exceptions import *
+from algorithm.type_spec import *
+from algorithm.algorithm import *
 
 
 class TestAlgorithm(unittest.TestCase):

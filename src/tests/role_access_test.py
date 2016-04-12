@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import unittest
 
-from server.storage.role_access import RoleAccess
-from server.storage.role import Role
-from server.storage.exceptions import ConfigError
+from storage.role_access import RoleAccess
+from storage.role import Role
+from storage.exceptions import ConfigError
 
 
 class TestRoleAccess(unittest.TestCase):

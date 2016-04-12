@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH=$PYTHONPATH:`realpath ..`
+export PYTHONPATH=$PYTHONPATH:`realpath ../server`
 
 failed=()
 

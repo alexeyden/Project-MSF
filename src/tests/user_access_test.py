@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import unittest
 
-from server.storage.user import User
-from server.storage.user_access import UserAccess
-from server.storage.exceptions import ConfigError
+from storage.user import User
+from storage.user_access import UserAccess
+from storage.exceptions import ConfigError
 
 
 class TestUserAccess(unittest.TestCase):

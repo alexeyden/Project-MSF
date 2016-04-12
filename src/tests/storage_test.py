@@ -3,10 +3,10 @@ import unittest
 import shutil
 import os
 
-from server.storage.storage import *
-from server.storage.exceptions import *
-from server.algorithm.type_spec import *
-from server.algorithm.algorithm import *
+from storage.storage import *
+from storage.exceptions import *
+from algorithm.type_spec import *
+from algorithm.algorithm import *
 
 
 class TestStorage(unittest.TestCase):

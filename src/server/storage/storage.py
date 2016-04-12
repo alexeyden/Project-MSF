@@ -12,7 +12,7 @@ from .role_access import RoleAccess
 from .user_access import UserAccess
 from .exceptions import *
 
-from server.algorithm.algorithm import Algorithm
+from algorithm.algorithm import Algorithm
 
 
 class FileInfo:

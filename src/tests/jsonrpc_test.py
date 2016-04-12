@@ -3,7 +3,7 @@ import unittest
 import asyncio
 import json
 
-from server.util import jsonrpc
+from util import jsonrpc
 
 
 class TestJsonRPC(unittest.TestCase):
