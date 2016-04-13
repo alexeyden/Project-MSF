@@ -19,7 +19,7 @@ class Server:
 
         self._dispatcher = jsonrpc.Dispatcher(self)
         self._debug = debug
-        self._storage = Storage(storage_path=data_path)
+        self.storage = Storage(storage_path=data_path)
 
     @jsonrpc_method(str, str)
     async def user_authorize(self, login, password):
@@ -65,10 +65,16 @@ class Server:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--data', help='data storage path', default='data')
+    parser.add_argument('-d', '--data', help='data storage path', default='data', metavar='DATA_PATH')
     parser.add_argument('-v', '--verbose', help='print debug messages', action='store_true')
-    parser.add_argument('-l', '--listen', help='listening host', default='')
+    parser.add_argument('-l', '--listen', help='listening host', default='', metavar='HOST')
     parser.add_argument('-p', '--port', help='listening port', default=8080, type=int)
+
+    parser.add_argument('-a', '--add-user', help='create new user and exit', nargs=2,
+                        metavar=('LOGIN', 'PASSWORD'))
+    parser.add_argument('-c', '--change-password', help='change password and exit', nargs=2,
+                        metavar=('LOGIN', 'NEW_PASSWORD'))
+    parser.add_argument('-r', '--remove-user', help='delete user and exit', metavar='LOGIN')
 
     args = parser.parse_args()
 
@@ -78,6 +84,24 @@ def main():
         print('Config Error ({1}):\n\t{0}'.format(*error.args), file=sys.stderr)
 
         sys.exit(1)
+
+    if args.add_user:
+        if not server.storage.users.create(*args.add_user):
+            print('User already exists')
+            sys.exit(1)
+        sys.exit(0)
+
+    if args.change_password:
+        if not server.storage.users.change_password(*args.change_password):
+            print('No such user')
+            sys.exit(1)
+        sys.exit(0)
+
+    if args.remove_user:
+        if not server.storage.users.remove(*args.remove_user):
+            print('No such user')
+            sys.exit(1)
+        sys.exit(0)
 
     if args.verbose:
         print('Server is listening on {0}:{1}'.format(args.listen, args.port))
