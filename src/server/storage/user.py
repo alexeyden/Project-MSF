@@ -10,3 +10,12 @@ class User:
             self.password == other.password and \
             self.token == other.token and \
             self.token_expire == other.token_expire
+
+    def __str__(self):
+        return 'User (login={0}, password={1}, token={2}, token_expire={3})' \
+            .format(self.login, self.password, self.token, self.token_expire)
+
+    def to_dict(self):
+        return {
+            'password': self.password
+        }

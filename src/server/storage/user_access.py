@@ -1,5 +1,8 @@
 import os
 import json
+import hashlib
+import time
+import random
 
 from .user import User
 from .exceptions import ConfigError
@@ -38,14 +41,61 @@ class UserAccess:
     def all(self):
         return self.users.values()
 
+    def auth(self, login, password):
+        if login not in self.users:
+            return None
+
+        hash_ = self._hash_password(password)
+
+        user = self.users.get(login)
+
+        if user.password != hash_:
+            return None
+
+        # TODO: proper token generation
+
+        token = login + str(time.time()) + str(random.uniform(0, 1))
+        token_hash = hashlib.md5(token.encode('utf-8')).hexdigest()
+
+        user.token = token_hash
+        user.token_expire = time.time() + 6 * 60 * 60
+
+        return token_hash
+
     def by_login(self, login):
         return self.users.get(login, None)
 
-    def create(self, user):
-        raise NotImplementedError()
+    def create(self, login, password):
+        if login in self.users:
+            return False
 
-    def change_password(self, user, new_password):
-        raise NotImplementedError()
+        self.users[login] = User(login=login, password=password)
+        self._save_config()
 
-    def remove(self, user):
-        raise NotImplementedError()
+        return True
+
+    def change_password(self, login, new_password):
+        if login not in self.users:
+            return False
+
+        self.users[login].password = self._hash_password(new_password)
+        self._save_config()
+
+        return True
+
+    def remove(self, login):
+        if login not in self.users:
+            return False
+
+        self.users.pop(login)
+        self._save_config()
+
+        return True
+
+    def _hash_password(self, password):
+        return hashlib.md5(password.encode('utf-8')).hexdigest()
+
+    def _save_config(self):
+        with open(self.config_path, 'w') as f:
+            text = json.dumps({login: user.to_dict() for login,user in self.users.items()}, indent=True)
+            f.write(text)
