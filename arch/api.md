@@ -11,6 +11,15 @@ POST https://server-name/api
     "id" : "client token"
 }
 ```
+
+```json
+{
+    "result": "sdsd",
+    "error": null,
+    "id": "client token"
+}
+```
+
 ## Методы
 Авторизация:
 ```
