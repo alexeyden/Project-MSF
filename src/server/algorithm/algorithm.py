@@ -1,7 +1,6 @@
 import json
 
 from .exceptions import *
-from .type_spec import *
 
 
 class Algorithm:
@@ -20,29 +19,28 @@ class Algorithm:
         try:
             js = json.loads(text)
 
-            if 'input_spec' not in js:
-                raise AlgorithmDecodeError('No input_spec', text)
-            if 'output_spec' not in js:
-                raise AlgorithmDecodeError('No output spec', text)
-            if 'source' not in js:
-                raise AlgorithmDecodeError('No source', text)
-            if type(js['input_spec']) != list:
-                raise AlgorithmDecodeError('Wrong input spec format', text)
-
-            input_spec = [TypeSpec.from_dict(spec) for spec in js['input_spec']]
-            output_spec = TypeSpec.from_dict(js['output_spec'])
-            source = js['source']
-
-            return Algorithm(input_spec=input_spec, output_spec=output_spec, source=source)
-
+            return Algorithm.from_dict(js)
         except json.JSONDecodeError as err:
             raise AlgorithmDecodeError('Invalid JSON', text) from err
 
-    def to_json(self):
-        body = dict(
-            input_spec=[spec.to_dict() for spec in self.input_spec],
-            output_spec=self.output_spec.to_dict(),
-            source=self.source
-        )
+    @staticmethod
+    def from_dict(js):
+        if 'input_spec' not in js:
+            raise AlgorithmDecodeError('No input_spec', js)
+        if 'output_spec' not in js:
+            raise AlgorithmDecodeError('No output spec', js)
+        if 'source' not in js:
+            raise AlgorithmDecodeError('No source', js)
+        if type(js['input_spec']) != list:
+            raise AlgorithmDecodeError('Wrong input spec format', js)
+        if type(js['output_spec']) != list:
+            raise AlgorithmDecodeError('Wrong output spec format', js)
 
-        return json.dumps(body)
+        input_spec = js['input_spec']
+        output_spec = js['output_spec']
+        source = js['source']
+
+        return Algorithm(input_spec=input_spec, output_spec=output_spec, source=source)
+
+    def to_dict(self):
+        return self.__dict__

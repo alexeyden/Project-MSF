@@ -1,18 +1,4 @@
 {
-  "input_spec":
-  [
-    {
-      "type" : "list",
-      "child" : {
-        "type" : "int",
-        "child" : null
-      }
-    },
-    {
-      "type" : "int",
-      "child" : null
-    }
-  ],
-
+  "input_spec": ["a", "b" ],
   "source" : "(some (source (here)))"
 }

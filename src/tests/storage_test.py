@@ -5,7 +5,6 @@ import os
 
 from storage.storage import *
 from storage.exceptions import *
-from algorithm.type_spec import *
 from algorithm.algorithm import *
 
 
@@ -157,7 +156,7 @@ class TestStorage(unittest.TestCase):
         self.assertEqual(self.storage.exists('/user1/A/С', context=context), True)
         loop.run_until_complete(self.storage.remove('/user1/A/С', context=context))
 
-        a = Algorithm(input_spec=[TypeSpec(type_=TypeSpec.INT)], output_spec=TypeSpec(type_=TypeSpec.INT), source='(foo)')
+        a = Algorithm(input_spec=['a'], output_spec=['x'], source='(foo)')
         loop.run_until_complete(self.storage.create('/user1/A/File', context=context, content=a))
         self.assertEqual(self.storage.exists('/user1/A/File', context=context), True)
         a = loop.run_until_complete(self.storage.file_read('/user1/A/File'))
@@ -173,7 +172,7 @@ class TestStorage(unittest.TestCase):
         with self.assertRaises(NoSuchPathError):
             loop.run_until_complete(self.storage.file_read('/user1/D', context))
 
-        a = Algorithm(input_spec=[TypeSpec(type_=TypeSpec.INT)], output_spec=TypeSpec(type_=TypeSpec.INT), source='(foo)')
+        a = Algorithm(input_spec=['x'], output_spec=['y'], source='(foo)')
         loop.run_until_complete(self.storage.create('/user1/A/File', context=context, content=a))
 
         a.source = '(bar)'

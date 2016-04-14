@@ -1,24 +1,5 @@
 {
-  "input_spec":
-  [
-    {
-      "type" : "list",
-      "child" : {
-        "type" : "int",
-        "child" : null
-      }
-    },
-    {
-      "type" : "int",
-      "child" : null
-    }
-  ],
-
-  "output_spec" :
-  {
-    "type" : "real",
-    "child" : null
-  },
-
+  "input_spec": ["a", "b" ],
+  "output_spec" : ["x", "y"],
   "source" : "(some (source (here)))"
 }

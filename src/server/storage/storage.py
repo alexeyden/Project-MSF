@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import asyncio
+import json
 
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -24,6 +25,10 @@ class FileInfo:
         self.is_directory = is_directory
         self.can_write = can_write
         self.can_read = can_read
+
+    def to_dict(self):
+        return self.__dict__
+
 
 class Storage:
     class StorageContext:
@@ -199,7 +204,7 @@ class Storage:
             loop = asyncio.get_event_loop()
 
             def write_algorithm():
-                f.write(content.to_json().encode('utf-8'))
+                f.write(json.dumps(content.to_dict()).encode('utf-8'))
 
             coro = loop.run_in_executor(self._file_pool, write_algorithm)
             task = asyncio.ensure_future(coro)
@@ -215,7 +220,13 @@ class Storage:
             raise NoSuchPathError('No such path', path)
 
         owner, *parts = self._path_split(path)
-        name = parts[-1] if parts != [] else '/'
+
+        name = '/'
+
+        if parts:
+            name = parts[-1]
+        elif owner:
+            name = owner
 
         is_directory = os.path.isdir(self._path_full(path))
         is_shared = False
