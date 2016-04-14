@@ -1,0 +1,80 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/jquery-ui.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
+        <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+
+        <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+        <script type="text/javascript" src="js/sliding_effect.js"></script>
+        <script type="text/javascript" src="js/vendor/modernizr-2.8.3.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+
+    </head>
+    <body>
+    <header>
+        <!--<img src="img/logo.png" id="logo"> -->
+        <div class="ui-widget">
+          <input type="text" id="FindInput" placeholder="Поиск алгоритма">
+        </div>
+        <label id="SiteName"> Web Service </label>
+        <!--<button id="find-but"> Find </button> -->
+    </header>
+    <div class="MainWindow">
+        <div id="navigation-block">
+            <img src="img/background.jpg" id="hide" />
+            <h2><span>Navigation Effect Using jQuery</span></h2>
+            <ul id="sliding-navigation">
+                <li class="sliding-element" id="add-but"><a href="#">Добавить алгоритм</a></li>
+                <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
+                <li class="sliding-element" id="del-but"><a href="#">Удалить алгоритм</a></li>
+                <li class="sliding-element" id="share-but"><a href="#">Поделиться алгоритм</a></li>
+                <li class="sliding-element" id="run-but"><a href="#">Запуск алгоритм</a></li>
+            </ul>
+        </div>
+        <div id="ShowWindows">
+            <div id="ShowAlgorithm">
+                <textarea id="CodeInput" placeholder="Код алгоритма" rows="10" cols="10" name="text"></textarea>
+            </div>
+            <div id="ShowResult">
+                <textarea id="ResultOut" placeholder="Результат выполнения" rows="10" cols="10" name="text"></textarea>
+            </div>
+        </div>
+        <!-- <div>
+            <button class="but" id = "exit-but">Выход</button>
+            <button class="but" id = "change-but">Смена пользователя</button>
+        </div> -->
+    </div>
+         <!--
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+
+        <p>Hello world! This is HTML5 Boilerplate.</p>
+
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    -->
+    </body>
+</html>
