@@ -58,17 +58,20 @@ FileInfo:
 ### Выгрузка алгоритма:
 
 ```
-path_fetch(path) -> algorithm
+algorithm_fetch(path) -> algorithm
 ```
 
 ### Исполнение:
 
 ```
-path_exec(path, args) -> result
+algorithm_exec(path, args) -> result
 ```
 
 ### Создание:
 
+```
+algorithm_create(path) -> result
+```
 ```
 path_create(path) -> result
 ```
@@ -81,13 +84,14 @@ path_move(source, dest) -> result
 
 ### Изменение:
 ```
-path_edit(path, alg) -> result
+algorithm_update(path, alg) -> result
 ```
 
 ### Удаление:
 ```
 path_remove(path) -> result
 ```
+
 ## Ошибки
 
 Формат:
@@ -101,5 +105,9 @@ path_remove(path) -> result
 
 ### Коды ошибок
 
-**1**. Ошибка авторизации (неверный логин пароль, неверный токен
+**01**. Ошибка авторизации (неверный логин пароль, неверный токен
+
+**02**. Неверный путь до директории\\файла
+
+**03**. Нет такого файла\\директории
 
