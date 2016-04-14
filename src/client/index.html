@@ -15,13 +15,14 @@
         <link rel="stylesheet" href="css/jquery-ui.min.css">
         <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
         <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
+        <link rel="stylesheet" href="css/style-tree.min.css" />
 
-        <script type="text/javascript" src="js/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/sliding_effect.js"></script>
-        <script type="text/javascript" src="js/vendor/modernizr-2.8.3.min.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
         <script src="js/go.js"></script>
+        <script src="js/jstree.min.js"></script>
         <script id="code">
         function init() {
         if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
@@ -283,18 +284,10 @@
         </div> -->
 
         <div id="sample" >
-          <div style="width:100%; white-space:nowrap;">
-            <span style="display: inline-block; vertical-align: top; padding: 5px; width:100px";>
-              <div id="myPaletteDiv" style="border: solid 1px gray; height: 720px"></div>
-            </span>
-
-            <span style="display: inline-block; vertical-align: top; padding: 5px; width:80%">
-              <div id="myDiagramDiv" style="border: solid 1px gray; height: 720px"></div>
-            </span>
-          </div>
-
-          <button onclick="load()">Запуск</button>
-          <textarea id="mySavedModel" style="width:100%;height:300px">
+        <div id="myPaletteDiv" ></div>
+        <div id="myDiagramDiv" ></div>
+        <button onclick="load()">Запуск</button>
+        <textarea id="mySavedModel" style="width:100%;height:300px">
         { "class": "go.GraphLinksModel",
           "linkFromPortIdProperty": "fromPort",
           "linkToPortIdProperty": "toPort",
@@ -327,8 +320,35 @@
         {"from":0, "to":4, "fromPort":"B", "toPort":"T"}
          ]}
           </textarea>
-          <div id="SVGArea"></div>
-</div>
+        <div id="SVGArea"></div>
+    </div>
+        <div id="jstree">
+            <!-- in this example the tree is populated from inline HTML -->
+            <ul>
+              <li>Root node 1
+                <ul>
+                  <li id="child_node_1">Child node 1</li>
+                  <li>Child node 2</li>
+                </ul>
+              </li>
+              <li>Root node 2</li>
+            </ul>
+          </div>
+
+          <script>
+          $(function () {
+            // 6 create an instance when the DOM is ready
+            $('#jstree').jstree();
+            // 7 bind to events triggered on the tree
+            $('#jstree').on("changed.jstree", function (e, data) {
+              console.log(data.selected);
+            });
+          });
+          </script>
+
+                </div>
+
+
     </div>
     </body>
 </html>
