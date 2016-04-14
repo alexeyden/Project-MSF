@@ -13,6 +13,7 @@ class UserAccess:
         self.config_path = config_path
         self.storage = storage
         self.users = dict()
+        self._token_map = dict()
         self.reload()
 
     def reload(self):
@@ -60,10 +61,15 @@ class UserAccess:
         user.token = token_hash
         user.token_expire = time.time() + 6 * 60 * 60
 
+        self._update_token_map()
+
         return token_hash
 
     def by_login(self, login):
         return self.users.get(login, None)
+
+    def by_token(self, token):
+        return self._token_map.get(token, None)
 
     def create(self, login, password):
         if login in self.users:
@@ -88,9 +94,17 @@ class UserAccess:
             return False
 
         self.users.pop(login)
+        self._update_token_map()
         self._save_config()
 
         return True
+
+    def _update_token_map(self):
+        self._token_map.clear()
+
+        for user in self.users.values():
+            if user.token:
+                self._token_map[user.token] = user
 
     def _hash_password(self, password):
         return hashlib.md5(password.encode('utf-8')).hexdigest()
