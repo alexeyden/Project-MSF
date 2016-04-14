@@ -46,8 +46,13 @@ class Dispatcher:
             return f
         return wrapper
 
-    def _register_method(self, name, coro, params):
-        self._handlers[name] = (coro, params)
+    @staticmethod
+    def remote_noauth(f):
+        f._json_rpc_dispatch_noauth = True
+        return f
+
+    def _register_method(self, name, coro, params, noauth=False):
+        self._handlers[name] = (coro, params, noauth)
 
     async def handle(self, json_):
         try:
@@ -60,16 +65,16 @@ class Dispatcher:
 
             id_ = obj['id']
 
-            if self._authenticator is not None:
+            if obj['method'] not in self._handlers:
+                return self._error_json(code=-32601, message="No such method")
+
+            handler, args_spec, no_auth = self._handlers.get(obj.get('method'))
+
+            if self._authenticator and not no_auth:
                 auth_ok = await self._authenticator(id_)
 
                 if not auth_ok:
                     raise AuthError(message='Invalid credentials')
-
-            if obj['method'] not in self._handlers:
-                return self._error_json(code=-32601, message="No such method")
-
-            handler, args_spec = self._handlers.get(obj.get('method'))
 
             if not self._validate_params(args_spec, obj.get('params')):
                 raise InvalidParamsError('Wrong arguments')
