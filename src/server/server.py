@@ -2,14 +2,37 @@
 
 import argparse
 import sys
+import time
 
 from aiohttp import web
 from util import jsonrpc
 
 from storage.storage import Storage
 from storage.exceptions import *
+from algorithm.algorithm import *
+from algorithm.executor import Executor
+from exceptions import *
 
 jsonrpc_method = jsonrpc.Dispatcher.remote_method
+jsonrpc_noauth = jsonrpc.Dispatcher.remote_noauth
+
+
+class Authenticator:
+    def __init__(self, storage):
+        self.storage = storage
+        self.token = None
+
+    async def __call__(self, token):
+        self.token = None
+
+        for user in self.storage.users.all():
+            # TODO: token expire
+
+            if user.token == token:
+                self.token = token
+                return True
+
+        return False
 
 
 class Server:    
@@ -17,41 +40,167 @@ class Server:
         self._app = web.Application()
         self._app.router.add_route('POST', '/api', self._handler)
 
-        self._dispatcher = jsonrpc.Dispatcher(self)
-        self._debug = debug
         self.storage = Storage(storage_path=data_path)
+        self.executor = Executor()
+
+        self._debug = debug
+        self._auth = Authenticator(self.storage)
+        self._dispatcher = jsonrpc.Dispatcher(self, self._auth)
 
     @jsonrpc_method(str, str)
+    @jsonrpc_noauth
     async def user_authorize(self, login, password):
-        return "user_authorize"
+        self._log('user_authorize({0}, {1})'.format(login, password))
+
+        auth_token = self.storage.users.auth(login, password)
+
+        if not auth_token:
+            self._log('  auth failed: invalid login or password')
+            raise jsonrpc.AuthError("Неверная пара логин\\пароль!")
+
+        self._log('return: auth token: {0}'.format(auth_token))
+        return auth_token
 
     @jsonrpc_method(str)
     async def path_list(self, path):
-        return "user_authorize"
+        self._log('path_list({0})'.format(path))
+
+        context = self._context()
+
+        try:
+            contents = self.storage.list(path, context)
+            result = [item.to_dict() for item in contents]
+
+            self._log("return: items: {0}".format(", ".join([item.name for item in contents])))
+
+            return result
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", path) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого каталога", path) from err
 
     @jsonrpc_method(str)
-    async def path_fetch(self, path):
-        return "path_fetch"
+    async def algorithm_fetch(self, path):
+        self._log('algorithm_fetch({0})'.format(path))
 
-    @jsonrpc_method(str, list)
-    async def path_exec(self, path, args):
-        return "path_exec"
+        context = self._context()
+
+        try:
+            contents = await self.storage.file_read(path, context)
+            result = contents.to_dict()
+            result['name'] = path.split('/')[-1]
+
+            self._log("return: algorithm {0}".format(result.get("name")))
+
+            return result
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", path) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого файла", path) from err
+
+    @jsonrpc_method(str, dict)
+    async def algorithm_exec(self, path, args):
+        self._log('algorithm_fetch({0})'.format(path))
+
+        context = self._context()
+
+        try:
+            self._log("  fetching algorithm")
+            alg = await self.storage.file_read(path, context)
+
+            self._log("  executing algorithm")
+            result = await self.executor.run(alg, args)
+
+            self._log("return: result: {0}".format(result))
+            return result
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", path) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого файла", path) from err
+
+    @jsonrpc_method(str, dict)
+    async def algorithm_create(self, path, alg_dict):
+        self._log('algorithm_create({0}, alg)'.format(path))
+
+        context = self._context()
+
+        alg = Algorithm.from_dict(alg_dict)
+
+        try:
+            await self.storage.create(path, content=alg, context=context)
+
+            self._log("return: OK")
+
+            return 'OK'
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", path) from err
 
     @jsonrpc_method(str)
     async def path_create(self, path):
-        return "path_create"
+        self._log('path_create({0})'.format(path))
+
+        context = self._context()
+
+        try:
+            await self.storage.create(path, context=context)
+
+            self._log("return: OK")
+
+            return 'OK'
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", path) from err
 
     @jsonrpc_method(str, str)
     async def path_move(self, source, dest):
-        return "path_move"
+        self._log('path_move({0},{1})'.format(source, dest))
+
+        context = self._context()
+
+        try:
+            await self.storage.move(source, dest, context)
+
+            self._log("return: OK")
+
+            return 'OK'
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", err.args[1]) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого файла или каталога", err.args[1]) from err
 
     @jsonrpc_method(str, dict)
-    async def path_edit(self, path, alg):
-        return "path_edit"
+    async def algorithm_update(self, path, alg_dict):
+        self._log('algorithm_update({0}, alg)'.format(path))
+
+        context = self._context()
+        alg = Algorithm.from_dict(alg_dict)
+
+        try:
+            await self.storage.file_write(path, alg, context)
+
+            self._log("return: OK")
+
+            return 'OK'
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", err.args[1]) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого файла", err.args[1]) from err
 
     @jsonrpc_method(str)
     async def path_remove(self, path):
-        return "path_remove"
+        self._log('algorithm_update({0}, alg)'.format(path))
+
+        context = self._context()
+
+        try:
+            await self.storage.remove(path, context)
+
+            self._log("return: OK")
+
+            return 'OK'
+        except InvalidPathError as err:
+            raise RpcInvalidPathError("Неверный путь", err.args[1]) from err
+        except NoSuchPathError as err:
+            raise RpcNoSuchPathError("Нет такого файла или каталога", err.args[1]) from err
 
     async def _handler(self, request):
         text = await request.text()
@@ -61,6 +210,14 @@ class Server:
     
     def run(self, host, port):
         web.run_app(self._app, host=host, port=port)
+
+    def _context(self):
+        user = self.storage.users.by_token(self._auth.token)
+        return Storage.StorageContext(user_login=user.login)
+
+    def _log(self, msg):
+        if self._debug:
+            print(msg)
 
 
 def main():
