@@ -1,9 +1,13 @@
 # JSON-RPC API
 
+http://www.jsonrpc.org/specification
+
+Обращение к серверу:
 ```
 POST https://server-name/api
 ```
 
+Вызов метода на сервере:
 ```json
 {
     "method" : "called method",
@@ -12,6 +16,7 @@ POST https://server-name/api
 }
 ```
 
+Формат ответа:
 ```json
 {
     "result": "sdsd",
@@ -20,47 +25,81 @@ POST https://server-name/api
 }
 ```
 
-## Методы
-Авторизация:
+## Методы#
+### Авторизация
+
 ```
-user_authorize(login, password) -> token : user token
+user_authorize(login, password) -> token
 ```
 
-Список содержимого директории:
+`token` - временный токен (строка)
+
+### Список содержимого директории
+
 ```
-path_list(path) -> {type: dir/file/link, name: item name}
+path_list(path) -> paths
 ```
 
-Выгрузка алгоритма:
-```
-path_fetch(path) -> {name, input_spec, output_spec, source}
+`paths` - список объектов FileInfo
+
+FileInfo:
+```json
+{
+    "name" : name
+    "path" : path
+    "owner" : owner
+    "shared" : shared
+    "is_directory" : is_directory
+    "can_write" :  can_write
+    "can_read" : can_read
+}
 ```
 
-Исполнение:
+### Выгрузка алгоритма:
+
+```
+path_fetch(path) -> algorithm
+```
+
+### Исполнение:
+
 ```
 path_exec(path, args) -> result
 ```
 
-Создание:
+### Создание:
+
 ```
 path_create(path) -> result
 ```
 
-Перемещение:
+### Перемещение:
+
 ```
 path_move(source, dest) -> result
 ```
 
-Изменение:
+### Изменение:
 ```
 path_edit(path, alg) -> result
 ```
 
-Удаление:
+### Удаление:
 ```
 path_remove(path) -> result
 ```
-## Коды ошибок
+## Ошибки
 
-Невалидный токен (1)
+Формат:
+```json
+{
+    "code": 1,
+    "message": "some message",
+    "data": "additional data"
+}
+```
+
+### Коды ошибок
+
+**1**. Ошибка авторизации (неверный логин пароль, неверный токен
 
