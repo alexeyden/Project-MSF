@@ -6,8 +6,8 @@ import sys
 
 if __name__ == '__main__':
     method = sys.argv[1]
-    id_ = sys.argv[2]
-    js = sys.argv[3]
+    js = sys.argv[2]
+    id_ = sys.argv[3]
 
     loop = asyncio.get_event_loop()
 
@@ -20,6 +20,10 @@ if __name__ == '__main__':
     }}
     """.format(id_, method, js)
 
+    print('Request:')
+    print(req)
+
     with aiohttp.ClientSession(loop=loop) as session:
         resp = loop.run_until_complete(session.post('http://127.0.0.1:8080/api', data=req.encode('utf-8')))
+        print('Response:')
         print(loop.run_until_complete(resp.text()))
