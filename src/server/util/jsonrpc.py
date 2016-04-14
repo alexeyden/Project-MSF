@@ -30,7 +30,8 @@ class Dispatcher:
         handler_attrs = type(handler).__dict__
         for key, value in handler_attrs.items():
             if hasattr(value, "_json_rpc_dispatch_method"):
-                self._register_method(key, value, value._json_rpc_dispatch_method)
+                noauth = hasattr(value, "_json_rpc_dispatch_noauth")
+                self._register_method(key, value, value._json_rpc_dispatch_method, noauth)
 
     @staticmethod
     def remote_method(*param_types):
