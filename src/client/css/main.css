@@ -114,39 +114,70 @@ textarea {
     header{
         background-color: #333333;
         height: 32px;
-
     }
     .MainWindow{
         position:relative;
-        border-color: #1c94c4;
         top:25px;
-        max-width: 1300px;
+        max-width: 1580px;
         min-width: 1500px;
         min-height: 1000px;
+        width: 100%;
     }
     .but{
         position: relative;
         float: right;
         top: -50px;
     }
+    #jstree{
+        position: relative;
+        background-color: white;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        min-width: 300px;
+        min-height: 400px;
+        max-width: 300px;
+        max-height: 400px;
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+        padding: 12px 20px 12px 40px;
+        float: right;
+        top: 0px;
+        
+    }
     #sample{
         position: relative;
         left: 50px;
+        border-color: #1c94c4;
+        width: 1000px;
+        overflow: auto;
+        float: left;
     }
     #mySavedModel{
         display: none;
     }
-    #myPaletteDiv, myDiagramDiv{
+    #myPaletteDiv{
+        position: relative;
         background-color: white;
         box-sizing: border-box;
         border: 2px solid #ccc;
         border-radius: 5px;
+        height: 720px;
+        width:18%;
+        overflow: auto;
+        float: left;
     }
     #myDiagramDiv{
+        position: relative;
         background-color: white;
         box-sizing: border-box;
         border: 2px solid #ccc;
         border-radius: 5px;
+        width:80%;
+        height: 720px;
+        float: right;
+        margin: 0px;
     }
     #SiteName{
         font-family: Arial;
