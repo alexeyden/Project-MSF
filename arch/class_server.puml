@@ -2,6 +2,29 @@
 
 title Диграмма классов серверного приложения
 
+package server <<Rect>> {
+  class Server
+}
+
+package storage <<Rect>> {
+  class Storage
+  class UserAccess
+  class RoleAccess
+  class Role
+  class User
+  class FileInfo
+}
+
+package algorithm <<Rect>> {
+  class Algorithm
+  class Executor
+  class OpEval
+  class GraphNode
+  class GraphNodeType
+  class GraphEvalContext
+  class GraphEval
+}
+
 class Server {
     HTTP-сервер
     ..
@@ -11,8 +34,8 @@ class Server {
     - on_user_authorize(login : String, password : String) : String
     - on_path_list(path: String) : Dict[]
     - on_path_fetch(path : String) : Algorithm
-    - on_path_exec(path : String, args : TypedValue[]) : TypedValue
-    - on_path_create(path : String) : TypedValue
+    - on_path_exec(path : String, args : List) : Real
+    - on_path_create(path : String) : String
     - on_path_move(src : String, dst : String) : String
     - on_path_edit(path : String, algorithm : Algorithm) : String
     - on_path_remove(path : String) : String
@@ -32,29 +55,38 @@ class Storage {
     --
     + open()
     + close()
-    + list(path : String) : String[]
-    + move(src : String, dst : String)
-    + remove(path : String) : String[]
-    + file_read(path : String) : Any
-    + file_type(path : String) : FileType
+    + list(path : String, context : User) : String[]
+    + move(src : String, dst : String,  context : User)
+    + remove(path : String,  context : User) : String[]
+    + create(path : String, content : Algorithm, context : User)
+    + update(path : String, content : Algorithm, context : User)
+    + file_read(path : String, context : User) : Any
+    + file_info(path : String, context : User) : FileInfo
 }
 
-Storage ..> FileType
+Storage ..> FileInfo
+Storage ..> Algorithm
+Storage ..> User
 Storage --* UserAccess
 Storage --* RoleAccess
 
-enum FileType {
-    Тип файла
+class FileInfo {
+    Информация о файле
     ..
-    + DIRECTORY
-    + ALGORITHM
-    + LINK
+    + path : String
+    + owner : String
+    + shared : Bool
+    + is_directory : Bool
+    + can_write : Bool
+    + can_read : Bool
 }
 
 class UserAccess {
     Доступ к списку пользователей
     ..
     + by_login(login : String) : User
+    + by_token(token : String) : User
+    + auth(login : String, password : String) : String
     + create(user : User)
     + change_password(user : User, new_password : String)
     + remove(user : User)
@@ -77,12 +109,10 @@ RoleAccess ..> Role
 class Algorithm {
     Алгоритм
     ..
-    + input_spec : TypeSpec[]
-    + output_spec : TypeSpec
+    + input_spec : String[]
+    + output_spec : String[]
     + source : String
 }
-
-Algorithm --* TypeSpec
 
 class Role {
     Роль
@@ -103,51 +133,65 @@ class User {
     + token_expire : DateTime
 }
 
-class TypedValue {
-    Типизированное значение
-    ..
-    + type : TypeSpec
-    + value : Any
+class OpEval {
+  Исполнитель математических выражений
+  ..
+  + variables : Dict
+  + functions : Dict
+  --
+  + eval(expr : String)
 }
 
-TypedValue --* TypeSpec
-
-class TypeSpec {
-    Описание типа данных
-    ..
-    + type : Type
-    + child : TypeSpec
+enum GraphNodeType {
+  Тип ноды
+  ..
+  + START
+  + OP
+  + IF
+  + END
 }
 
-TypeSpec --* TypeSpec
-TypeSpec --* Type
-
-enum Type {
-    Типы данных
-    ..
-    + INT
-    + REAL
-    + STRING
-    + LIST
+class GraphNode {
+  Узел графа блок-схемы
+  ..
+  + type : GraphNodeType
+  + op : String
+  + children : GraphNode []
 }
 
-abstract class Executor {
+GraphNode --* GraphNodeType
+GraphNode --* GraphNode
+
+class GraphEvalContext {
+  Контекст для исполнителя
+  ..
+  + variables : Dict
+  + functions : Dict
+}
+
+class GraphEval {
+  Исполнитель алгоритма,
+  представленного блок-схемой
+  ..
+  + start : GraphNode
+  + context : GraphEvalContext
+  --
+  + next() : Bool
+}
+
+GraphEval --o GraphNode
+GraphEval --o GraphEvalContext
+GraphEval ..> OpEval
+
+class Executor {
     Исполнитель алгоритмов
     ..
     + timeout : Real
     --
-    + execute(algorithm : Algorithm) : TypedValue
+    + eval(algorithm : Algorithm) : Real
 }
 
 Executor ..> Algorithm
-Executor ..> TypedValue
-
-class SchemeExecutor {
-    Исполнитель программ на Scheme
-    ..
-    + execute(algorithm : Algorithm) : TypedValue
-}
-
-SchemeExecutor --|> Executor
+Executor ..> GraphEval
 
 @enduml
