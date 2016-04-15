@@ -39,6 +39,7 @@ class Server:
     def __init__(self, data_path, debug=False):
         self._app = web.Application()
         self._app.router.add_route('POST', '/api', self._handler)
+        self._app.router.add_static('/', '../client')
 
         self.storage = Storage(storage_path=data_path)
         self.executor = Executor()
@@ -207,7 +208,7 @@ class Server:
         resp = await self._dispatcher.handle(text)
 
         return web.Response(body=resp.encode('utf-8'))
-    
+
     def run(self, host, port):
         web.run_app(self._app, host=host, port=port)
 
@@ -218,7 +219,6 @@ class Server:
     def _log(self, msg):
         if self._debug:
             print(msg)
-
 
 def main():
     parser = argparse.ArgumentParser()
