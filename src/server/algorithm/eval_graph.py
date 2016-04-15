@@ -45,7 +45,7 @@ class NodeEval:
 
     def _eval(self):
         if self.node.kind == self.node.OP:
-            ops = self.node.split('\n')
+            ops = self.node.op.split('\n')
             ev = BlockEvaluator(self.context.variables, self.context.functions)
 
             for op in ops:
@@ -63,7 +63,7 @@ class NodeEval:
 
 
 class Evaluator:
-    def __init__(self, context, source):
+    def __init__(self, source, context):
         self.context = context
 
         data = json.loads(source)
