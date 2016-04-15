@@ -28,15 +28,13 @@
     });
   });
 
+  server= {}
+
   $.jsonRPC.setup({
-  endPoint: '/api'
+    endPoint: '/api'
   });
 
-  server= {}
-  function save() {
-    document.getElementById("mySavedModel").value = myDiagram.model.toJson();
-    myDiagram.isModified = false;
-    $.jsonRPC.request('user_authorize', {
+  $.jsonRPC.request('user_authorize', {
     params: ['user1', '123'],
       id: 'none',
 
@@ -47,9 +45,27 @@
         alert(JSON.stringify(result));
     }
   });
+
+  function save() {
+    source = myDiagram.model.toJson();
+
+    alg = {
+        input_spec: ['x'],
+        output_spec: ['y']
+        source: source
+    }
+
+    $.jsonRPC.request('algorithm_update', {
+            params: ['/user1/Alg', alg],
+            id: server.token,
+
+            success: function(result) {
+                alert(JSON.stringify(result));
+            }
+      });
   }
 
-  function exec(){
+  function exec() {
 
   }
 
