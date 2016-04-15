@@ -101,7 +101,7 @@ class Server:
 
     @jsonrpc_method(str, dict)
     async def algorithm_exec(self, path, args):
-        self._log('algorithm_fetch({0})'.format(path))
+        self._log('algorithm_fetch({0}, {1})'.format(path, args))
 
         context = self._context()
 
