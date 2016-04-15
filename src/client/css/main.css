@@ -235,7 +235,7 @@ textarea {
     }
     #InputArg{
         z-index: 50;
-        margin: 50px;
+        margin: 0px;
     }
 
     #ResultOut{

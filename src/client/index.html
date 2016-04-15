@@ -274,12 +274,16 @@
 
         <h2><span>Navigation Effect Using jQuery</span></h2>
         <ul id="sliding-navigation">
-            <li class="sliding-element" id="add-but"><a href="#">Добавить алгоритм</a></li>
+            <li class="sliding-element" id="add-but" onclick="save()"><a href="#">Добавить алгоритм</a></li>
             <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
             <li class="sliding-element" id="del-but"><a href="#">Удалить алгоритм</a></li>
             <li class="sliding-element" id="share-but"><a href="#">Поделиться алгоритм</a></li>
             <li class="sliding-element" id="run-but"><a href="#">Запуск алгоритм</a></li>
         </ul>
+        <div class="ui-widget">
+            <label style="color: #dddddd">x=</label>
+        <input type="text" id="InputArg" placeholder="x=" value="9">
+    </div>
     </div>
     <!--<div id="ShowWindows">
         <div id="ShowAlgorithm">
@@ -323,9 +327,6 @@
             </li>
             <li>Root node 2</li>
         </ul>
-    </div>
-    <div class="ui-widget">
-        <input type="text" id="InputArg" placeholder="x=">
     </div>
     <script>
         $(function () {
