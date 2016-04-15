@@ -31,13 +31,17 @@
   $.jsonRPC.setup({
   endPoint: '/api'
   });
+
+  server= {}
   function save() {
     document.getElementById("mySavedModel").value = myDiagram.model.toJson();
     myDiagram.isModified = false;
     $.jsonRPC.request('user_authorize', {
-    params: ['user', '123'],
+    params: ['user1', '123'],
+      id: 'none',
+
     success: function(result) {
-        alert(result);
+        server.token = result.result;
     },
     error: function(result) {
         alert(JSON.stringify(result));
