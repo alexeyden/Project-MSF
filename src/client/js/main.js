@@ -28,6 +28,8 @@
     });
   });
 
+  init();
+
   server= {}
 
   $.jsonRPC.setup({
@@ -40,6 +42,19 @@
 
     success: function(result) {
         server.token = result.result;
+
+         $.jsonRPC.request('algorithm_fetch', {
+            params: ['/user1/Alg'],
+            id: server.token,
+
+            success: function(result) {
+                src = result.result.source;
+                myDiagram.model = go.Model.fromJson(src);
+            },
+            error: function(result) {
+                alert(JSON.stringify(result));
+            }
+        });
     },
     error: function(result) {
         alert(JSON.stringify(result));
@@ -51,7 +66,7 @@
 
     alg = {
         input_spec: ['x'],
-        output_spec: ['y']
+        output_spec: ['y'],
         source: source
     }
 
@@ -62,10 +77,19 @@
             success: function(result) {
                 alert(JSON.stringify(result));
             }
-      });
+    });
   }
 
   function exec() {
+    var x = parseFloat(document.getElementById('InputArg').value);
 
+    $.jsonRPC.request('algorithm_exec', {
+        params: ['/user1/Alg', {x:x}],
+        id: server.token,
+
+        success: function(result) {
+            alert("Результат: " + JSON.stringify(result.result.y));
+        }
+    });
   }
 

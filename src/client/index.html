@@ -23,7 +23,7 @@
     <script src="js/go.js"></script>
     <script src="js/jstree.min.js"></script>
     <script src="js/jquery.jsonrpc.js"></script>
-    <script id="code">
+    <script type="text/javascript">
         function init() {
             if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
             var $ = go.GraphObject.make;  // for conciseness in defining templates
@@ -258,9 +258,8 @@
             }
         }
     </script>
-    <script type="text/javascript" src="js/main.js"></script>
 </head>
-<body onload="init()">
+<body>
 <header>
     <!--<img src="img/logo.png" id="logo"> -->
     <div class="ui-widget">
@@ -341,5 +340,7 @@
 </div>
 
 </div>
+
+    <script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>
