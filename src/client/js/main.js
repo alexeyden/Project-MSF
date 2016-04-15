@@ -75,7 +75,7 @@
             id: server.token,
 
             success: function(result) {
-                alert(JSON.stringify(result));
+                alert(JSON.stringify(result.result));
             }
     });
   }
