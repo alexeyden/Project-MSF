@@ -28,3 +28,20 @@
     });
   });
 
+  $.jsonRPC.setup({
+  endPoint: '/api',
+  });
+  function save() {
+    document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+    myDiagram.isModified = false;
+    $.jsonRPC.request('user_authorize', {
+    params: ['user', '123'],
+    success: function(result) {
+        alert(result);
+    },
+    error: function(result) {
+      // Result is an RPC 2.0 compatible response object
+    }
+  });
+  }
+
