@@ -260,74 +260,54 @@
     </script>
 </head>
 <body>
-<header>
-    <!--<img src="img/logo.png" id="logo"> -->
-    <div class="ui-widget">
+
+    <div id="head">
+        <label id="SiteName"> Web Service </label>
         <input type="text" id="FindInput" placeholder="Поиск алгоритма">
     </div>
-    <label id="SiteName"> Web Service </label>
-    <!--<button id="find-but"> Find </button> -->
-</header>
-<div class="MainWindow">
-    <div id="navigation-block">
-        <img src="img/background.jpg" id="hide"/>
 
-        <h2><span>Navigation Effect Using jQuery</span></h2>
-        <ul id="sliding-navigation">
-            <li class="sliding-element" id="add-but" onclick="save()"><a href="#">Добавить алгоритм</a></li>
-            <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
-            <li class="sliding-element" id="del-but"><a href="#">Удалить алгоритм</a></li>
-            <li class="sliding-element" id="share-but"><a href="#">Поделиться алгоритм</a></li>
-            <li class="sliding-element" id="run-but"><a href="#">Запуск алгоритм</a></li>
-        </ul>
-        <div class="ui-widget">
-            <label style="color: #dddddd">x=</label>
-        <input type="text" id="InputArg" placeholder="x=" value="9">
-    </div>
-    </div>
-    <!--<div id="ShowWindows">
-        <div id="ShowAlgorithm">
-            <textarea id="CodeInput" placeholder="Код алгоритма" rows="10" cols="10" name="text"></textarea>
+    <div class="MainWindow">
+        <div id="navigation-block">
+            <ul id="sliding-navigation">
+                <li class="sliding-element" id="add-but" onclick="save()"><a href="#">Добавить алгоритм</a></li>
+                <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
+                <li class="sliding-element" id="del-but"><a href="#">Удалить алгоритм</a></li>
+                <li class="sliding-element" id="share-but"><a href="#">Поделиться алгоритм</a></li>
+                <li class="sliding-element" id="run-but" onclick="exec()"><a href="#">Запуск алгоритм</a></li>
+            </ul>
+            <div class="ui-widget">
+                <label style="color: #dddddd; margin: 10px">Введённое значение x:</label>
+                <input type="text" id="InputArg" placeholder="x=" value="9">
+            </div>
         </div>
-        <div id="ShowResult">
-            <textarea id="ResultOut" placeholder="Результат выполнения" rows="10" cols="10" name="text"></textarea>
+        <div id="sample">
+            <div id="myPaletteDiv"></div>
+            <div id="myDiagramDiv">
+            </div>
+            <textarea id="mySavedModel" style="width:100%;height:300px">
+            { "class": "go.GraphLinksModel",
+      "linkFromPortIdProperty": "fromPort",
+      "linkToPortIdProperty": "toPort",
+      "nodeDataArray": [],
+      "linkDataArray": []}
+              </textarea>
+
+            <div id="SVGArea"></div>
         </div>
-    </div>-->
-
-    <!-- <div>
-        <button class="but" id = "exit-but">Выход</button>
-        <button class="but" id = "change-but">Смена пользователя</button>
-    </div> -->
-
-    <div id="sample">
-        <div id="myPaletteDiv"></div>
-        <div id="myDiagramDiv">
-
+        <div id="jstree">
+            <!-- in this example the tree is populated from inline HTML -->
+            <ul>
+                <li>Root node 1
+                    <ul>
+                        <li id="child_node_1">Child node 1</li>
+                        <li>Child node 2</li>
+                    </ul>
+                </li>
+                <li>Root node 2</li>
+            </ul>
         </div>
-        <button onclick="exec()">Запуск</button>
-        <button id="SendJson" onclick="save()">Save</button>
-        <textarea id="mySavedModel" style="width:100%;height:300px">
-        { "class": "go.GraphLinksModel",
-  "linkFromPortIdProperty": "fromPort",
-  "linkToPortIdProperty": "toPort",
-  "nodeDataArray": [],
-  "linkDataArray": []}
-          </textarea>
+    </div>
 
-        <div id="SVGArea"></div>
-    </div>
-    <div id="jstree">
-        <!-- in this example the tree is populated from inline HTML -->
-        <ul>
-            <li>Root node 1
-                <ul>
-                    <li id="child_node_1">Child node 1</li>
-                    <li>Child node 2</li>
-                </ul>
-            </li>
-            <li>Root node 2</li>
-        </ul>
-    </div>
     <script>
         $(function () {
             // 6 create an instance when the DOM is ready
@@ -338,7 +318,6 @@
             });
         });
     </script>
-</div>
 
 </div>
 

@@ -113,48 +113,62 @@ textarea {
     }
     header{
         background-color: #333333;
-        height: 32px;
+        height: 50px;
     }
     .MainWindow{
         position:relative;
-        top:25px;
-        max-width: 1580px;
-        min-width: 1500px;
-        min-height: 1000px;
+        max-width: 1200px;
+        min-width: 1200px;
+        min-height: 550px;
         width: 100%;
+        height: 100%;
+    }
+    #navigation-block {
+        position:relative;
+        float: left;
+        width: 20%;
+        border-color: #1c94c4;
+    }
+    #InputArg{
+        margin: 10px;
+        float: left;
+        min-width: 100px;
+        width: 10%;
+        background-color: rgba(207, 220, 225, 0.45);
+    }
+    #sample{
+        position: relative;
+        border-color: #1c94c4;
+        width: 50%;
+        height: 400px;
+        height: 70%;
+        float: left;
+    }
+    #jstree{
+        background-color: white;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        min-width: 290px;
+        min-height: 200px;
+        max-height: 400px;
+        height: 50%;
+        width: 25%;
+        overflow: auto;
+        padding: 12px 20px 12px 40px;
+        float: left;
+        margin-left: 5px;
     }
     .but{
         position: relative;
         float: right;
         top: -50px;
     }
-    #jstree{
-        left: 5px;
-        background-color: white;
-        box-sizing: border-box;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        min-width: 300px;
-        min-height: 400px;
-        max-width: 300px;
-        max-height: 400px;
-        height: 100%;
-        width: 80%;
-        overflow: auto;
-        padding: 12px 20px 12px 40px;
-        float: right;
-        top: 0px;
+    #head{
+        height: 50px;
+        width: 100%;
     }
-    #sample{
-        position: relative;
-        left: 50px;
-        border-color: #1c94c4;
-        min-width: 700px;
-        min-height: 720px;
-        height: 100%;
-        overflow: auto;
-        float: left;
-    }
+
     #mySavedModel{
         display: none;
     }
@@ -164,7 +178,7 @@ textarea {
         box-sizing: border-box;
         border: 2px solid #ccc;
         border-radius: 5px;
-        height: 720px;
+        height: 500px;
         width:18%;
         overflow: auto;
         float: left;
@@ -176,16 +190,17 @@ textarea {
         border: 2px solid #ccc;
         border-radius: 5px;
         width:80%;
-        height: 720px;
+        height: 500px;
         float: right;
         margin: 0px;
     }
     #SiteName{
         font-family: Arial;
         color: #c77405;
-        padding: 50px;
-        vertical-align: middle;
+        margin-left: 50px;
+        margin-top: 5px;
         font-size: 1.4em;
+        float: left;
     }
     #find-but{
         position: relative;
@@ -205,11 +220,14 @@ textarea {
         float: left;
     }
     #FindInput{
-        position: fixed;
+        position: relative;
         top: 2.5px;
-        left: 250px;
-        width: 800px;
+        margin-left: 64px;
+        width: 70%;
+        min-width: 400px;
+        max-width: 600px;
         height: 20px;
+        float: left;
 
         box-sizing: border-box;
         border: 2px solid #ccc;
@@ -232,10 +250,6 @@ textarea {
         background-position: 10px 10px;
         background-repeat: no-repeat;
         padding: 12px 20px 12px 40px;
-    }
-    #InputArg{
-        z-index: 50;
-        margin: 0px;
     }
 
     #ResultOut{
@@ -272,15 +286,6 @@ textarea {
         left: 50px;
         overflow: auto;
         float: top;
-    }
-    #navigation-block {
-        position:relative;
-        left:30px;
-        float: left;
-        width: 200px;
-        top: -50px;
-        border-color: #1c94c4;
-        z-index: 2;
     }
     #hide {
         position:absolute;
