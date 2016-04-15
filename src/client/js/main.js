@@ -29,7 +29,7 @@
   });
 
   $.jsonRPC.setup({
-  endPoint: '/api',
+  endPoint: '/api'
   });
   function save() {
     document.getElementById("mySavedModel").value = myDiagram.model.toJson();
@@ -40,7 +40,7 @@
         alert(result);
     },
     error: function(result) {
-      // Result is an RPC 2.0 compatible response object
+        alert(JSON.stringify(result));
     }
   });
   }

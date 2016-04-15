@@ -149,7 +149,7 @@ textarea {
         position: relative;
         left: 50px;
         border-color: #1c94c4;
-        min-width: 1000px;
+        min-width: 700px;
         min-height: 720px;
         height: 100%;
         overflow: auto;
