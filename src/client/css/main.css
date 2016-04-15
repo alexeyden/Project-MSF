@@ -233,6 +233,11 @@ textarea {
         background-repeat: no-repeat;
         padding: 12px 20px 12px 40px;
     }
+    #InputArg{
+        z-index: 50;
+        margin: 50px;
+    }
+
     #ResultOut{
         width: 100%;
         height: 100%;
