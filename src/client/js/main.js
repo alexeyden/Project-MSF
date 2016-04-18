@@ -93,3 +93,15 @@
     });
   }
 
+function toggle_menu() {
+  var item = document.getElementById("panel_menu");
+
+  if(item.classList.contains('hide_menu')) {
+    item.classList.remove('hide_menu');
+    item.classList.add('show_menu');
+  }
+  else {
+    item.classList.remove('show_menu');
+    item.classList.add('hide_menu');
+  }
+}

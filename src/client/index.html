@@ -26,14 +26,16 @@
     <script src="js/flowchart.js"> </script>
 </head>
 <body>
-
-    <div id="head">
+    <div id="panel_top">
+        <button onclick="toggle_menu();" text="Menu">
+            Menu
+        </button>
         <label id="SiteName"> Web Service </label>
         <input type="text" id="FindInput" placeholder="Поиск алгоритма">
     </div>
 
-    <div class="MainWindow">
-        <div id="navigation-block">
+    <div id="panel_content">
+        <div id="panel_menu">
             <ul id="sliding-navigation">
                 <li class="sliding-element" id="add-but" onclick="save()"><a href="#">Добавить алгоритм</a></li>
                 <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
@@ -46,21 +48,13 @@
                 <input type="text" id="InputArg" placeholder="x=" value="9">
             </div>
         </div>
-        <div id="sample">
-            <div id="myPaletteDiv"></div>
-            <div id="myDiagramDiv">
-            </div>
-            <textarea id="mySavedModel" style="width:100%;height:300px">
-            { "class": "go.GraphLinksModel",
-      "linkFromPortIdProperty": "fromPort",
-      "linkToPortIdProperty": "toPort",
-      "nodeDataArray": [],
-      "linkDataArray": []}
-              </textarea>
 
-            <div id="SVGArea"></div>
+        <div id="panel_flowchart">
+            <div id="myPaletteDiv"></div>
+            <div id="myDiagramDiv"></div>
         </div>
-        <div id="jstree">
+
+        <div id="panel_right">
             <!-- in this example the tree is populated from inline HTML -->
             <ul>
                 <li>Root node 1
@@ -77,15 +71,13 @@
     <script>
         $(function () {
             // 6 create an instance when the DOM is ready
-            $('#jstree').jstree();
+            $('#panel_right').jstree();
             // 7 bind to events triggered on the tree
-            $('#jstree').on("changed.jstree", function (e, data) {
+            $('#panel_right').on("changed.jstree", function (e, data) {
                 console.log(data.selected);
             });
         });
     </script>
-
-</div>
 
     <script type="text/javascript" src="js/main.js"></script>
 </body>
