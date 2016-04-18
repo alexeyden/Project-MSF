@@ -11,17 +11,6 @@ function init() {
                         "animationManager.duration": 800, // slightly longer than default (600ms) animation
                         "undoManager.isEnabled": true  // enable undo & redo
                     });
-    // when the document is modified, add a "*" to the title and enable the "Save" button
-    myDiagram.addDiagramListener("Modified", function (e) {
-        var button = document.getElementById("SaveButton");
-        if (button) button.disabled = !myDiagram.isModified;
-        var idx = document.title.indexOf("*");
-        if (myDiagram.isModified) {
-            if (idx < 0) document.title += "*";
-        } else {
-            if (idx >= 0) document.title = document.title.substr(0, idx);
-        }
-    });
     // helper definitions for node templates
     function nodeStyle() {
         return [
@@ -187,7 +176,6 @@ function init() {
     // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
     myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
     myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
-    load();  // load an initial diagram from some JSON text
     // initialize the Palette that is on the left side of the page
     myPalette =
             $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
@@ -210,14 +198,6 @@ function showPorts(node, show) {
     node.ports.each(function (port) {
         port.stroke = (show ? "white" : null);
     });
-}
-// Show the diagram's model in JSON format that the user may edit
-function save() {
-    document.getElementById("mySavedModel").value = myDiagram.model.toJson();
-    myDiagram.isModified = false;
-}
-function load() {
-    myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
 }
 // add an SVG rendering of the diagram at the end of this page
 function makeSVG() {
