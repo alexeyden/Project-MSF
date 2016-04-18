@@ -199,15 +199,3 @@ function showPorts(node, show) {
         port.stroke = (show ? "white" : null);
     });
 }
-// add an SVG rendering of the diagram at the end of this page
-function makeSVG() {
-    var svg = myDiagram.makeSvg({
-        scale: 0.5
-    });
-    svg.style.border = "1px solid black";
-    obj = document.getElementById("SVGArea");
-    obj.appendChild(svg);
-    if (obj.children.length > 0) {
-        obj.replaceChild(svg, obj.children[0]);
-    }
-}
