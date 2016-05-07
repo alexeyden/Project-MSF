@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import os
 import time
 
 from aiohttp import web
@@ -38,8 +39,10 @@ class Authenticator:
 class Server:    
     def __init__(self, data_path, debug=False):
         self._app = web.Application()
-        self._app.router.add_route('POST', '/api', self._handler)
-        self._app.router.add_static('/', '../client')
+        self._app.router.add_route('POST', '/api', self._api_handler)
+        self._app.router.add_route('GET', '/{path:.*}', self._web_handler)
+
+        #self._app.router.add_static('/', '../client')
 
         self.storage = Storage(storage_path=data_path)
         self.executor = Executor()
@@ -62,16 +65,16 @@ class Server:
         self._log('return: auth token: {0}'.format(auth_token))
         return auth_token
 
-    @jsonrpc_method(str)
-    async def path_list(self, path):
+    @jsonrpc_method(str, bool)
+    async def path_list(self, path, recursive):
         self._log('path_list({0})'.format(path))
 
         context = self._context()
 
         try:
-            contents = self.storage.list(path, context)
+            contents = self.storage.list(path, context, recursive=recursive)
             result = [item.to_dict() for item in contents]
-
+            print(result)
             self._log("return: items: {0}".format(", ".join([item.name for item in contents])))
 
             return result
@@ -203,7 +206,24 @@ class Server:
         except NoSuchPathError as err:
             raise RpcNoSuchPathError("Нет такого файла или каталога", err.args[1]) from err
 
-    async def _handler(self, request):
+    async def _web_handler(self, request):
+        path = request.path
+        if path == '/':
+            path = '/index.html'
+
+        content_root = '../client'
+        if self._debug:
+            print('GET static file: ' + content_root + path)
+
+        if os.path.exists(content_root + path) and not os.path.isdir(content_root + path):
+            with open(content_root + path, 'rb') as f:
+                resp = f.read()
+        else:
+            raise web.HTTPNotFound()
+
+        return web.Response(body=resp)
+
+    async def _api_handler(self, request):
         text = await request.text()
         resp = await self._dispatcher.handle(text)
 

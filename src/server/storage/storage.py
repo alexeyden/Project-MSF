@@ -25,10 +25,18 @@ class FileInfo:
         self.is_directory = is_directory
         self.can_write = can_write
         self.can_read = can_read
+        self.children = None
 
     def to_dict(self):
-        return self.__dict__
+        result = self.__dict__
 
+        if result['children'] is not None:
+            children = []
+            for ch in result['children']:
+                children.append(ch.to_dict())
+            result['children'] = children
+
+        return result
 
 class Storage:
     class StorageContext:
@@ -63,7 +71,7 @@ class Storage:
 
         return self.users.by_login(login)
 
-    def list(self, path, context):
+    def list(self, path, context, recursive=False):
         if not self.valid(path):
             raise InvalidPathError('Invalid path', path)
 
@@ -83,6 +91,9 @@ class Storage:
             if self.exists(os.path.join(path, item), context):
                 item_path = os.path.join(path, item)
                 result.append(self.file_info(item_path, context))
+
+                if recursive and result[-1].is_directory:
+                    result[-1].children = self.list(os.path.join(path, item), context, recursive)
 
         return result
 

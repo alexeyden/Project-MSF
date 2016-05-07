@@ -20,10 +20,17 @@ if __name__ == '__main__':
     }}
     """.format(id_, method, js)
 
-    print('Request:')
-    print(req)
+    quiet = '-q' in sys.argv
+
+    if not quiet:
+        print('Request:')
+        print(req)
 
     with aiohttp.ClientSession(loop=loop) as session:
         resp = loop.run_until_complete(session.post('http://127.0.0.1:8080/api', data=req.encode('utf-8')))
-        print('Response:')
-        print(loop.run_until_complete(resp.text()))
+        text = loop.run_until_complete(resp.text())
+        if not quiet:
+            print('Response:')
+            print(text)
+        else:
+            print(json.dumps(json.loads(text)['result']))

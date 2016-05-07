@@ -85,6 +85,36 @@ class TestStorage(unittest.TestCase):
             '/user2/A/Alg1'
         ])
 
+        items = self.storage.list('/', context, True)
+        valid = {'/':
+            {
+                'user1': {
+                    'A': {
+                        'B': {}
+                    },
+                    'B': {}
+                },
+                'user2': {
+                    'A': {
+                        'Alg1': None
+                    }
+                }
+            }
+        }
+        items_dict = {'/': {}}
+
+        def traverse(parent, node):
+            if node.children is not None:
+                for ch in node.children:
+                    parent[ch.name] = {} if ch.children is not None else None
+                    traverse(parent[ch.name], ch)
+
+        root = FileInfo('/', '/', 'user1', True, True, False, False)
+        root.children = items
+        traverse(items_dict['/'], root)
+
+        self.assertDictEqual(valid, items_dict)
+
     def test_move(self):
         context = Storage.StorageContext('user1')
 

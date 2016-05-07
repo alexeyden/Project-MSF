@@ -10,75 +10,97 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place faicon.ico in the root directory -->
 
-    <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/jquery-ui.min.css">
     <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
-    <link rel="stylesheet" href="css/style-tree.min.css"/>
+    <link rel="stylesheet" href="css/tree-style.css"/>
 
-    <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="js/sliding_effect.js"></script>
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/sliding_effect.js"></script>
     <script src="js/go.js"></script>
     <script src="js/jstree.min.js"></script>
     <script src="js/jquery.jsonrpc.js"></script>
     <script src="js/flowchart.js"> </script>
 </head>
 <body>
-    <div id="panel_top">
-        <button onclick="toggle_menu();" text="Menu">
-            Menu
-        </button>
-        <label id="SiteName"> Web Service </label>
-        <input type="text" id="FindInput" placeholder="Поиск алгоритма">
+    <div id="auth_panel">
+        <span id="auth_logo"> Вход </span>
+        <span id="auth_error"> Неверный логин/пароль! </span>
+        <table border="0" id="auth_form">
+            <tr>
+                <td class="auth_text">Логин: </td>
+                <td class="auth_text"><input type="text" class="auth_input" id="auth_login" /></td>
+            </tr>
+            <tr>
+                <td class="auth_text">Пароль: </td>
+                <td class="auth_text"><input type="password" class="auth_input" id="auth_password" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="button" id="auth_button" value="Войти" /></td>
+            </tr>
+        </table>
     </div>
 
-    <div id="panel_content">
-        <div id="panel_menu">
-            <ul id="sliding-navigation">
-                <li class="sliding-element" id="add-but" onclick="save()"><a href="#">Добавить алгоритм</a></li>
-                <li class="sliding-element" id="edit-but"><a href="#">Редактировать алгоритм</a></li>
-                <li class="sliding-element" id="del-but"><a href="#">Удалить алгоритм</a></li>
-                <li class="sliding-element" id="share-but"><a href="#">Поделиться алгоритм</a></li>
-                <li class="sliding-element" id="run-but" onclick="exec()"><a href="#">Запуск алгоритм</a></li>
-            </ul>
-            <div class="ui-widget">
-                <label style="color: #dddddd; margin: 10px">Введённое значение x:</label>
-                <input type="text" id="InputArg" placeholder="x=" value="9">
+    <div id="main_panel">
+        <div id="panel_top">
+            <span id="menu_button" ></span>
+            <span id="SiteName"> Алгоритмы </span>
+            <input type="text" id="FindInput" placeholder="Поиск алгоритма">
+
+            <span id="user_exit">
+                
+            </span>
+            <span id="user">
+                UserName
+            </span>
+        </div>
+
+        <div id="panel_content">
+            <div id="panel_menu">
+                <ul id="sliding-navigation">
+                    <li class="sliding-element" id="open-but" onclick="save()">
+                        <a href="#"> <span class="icon_font"></span> Открыть </a>
+                    </li>
+                    <li class="sliding-element" id="add-but" onclick="save()">
+                        <a href="#"> <span class="icon_font"></span> Добавить </a>
+                    </li>
+                    <li class="sliding-element" id="edit-but">
+                        <a href="#"> <span class="icon_font"></span> Редактировать </a></li>
+                    <li class="sliding-element" id="del-but">
+                        <a href="#"> <span class="icon_font"></span> Удалить </a>
+                    </li>
+                    <li class="sliding-element" id="share-but">
+                        <a href="#"> <span class="icon_font"></span> Поделиться </a>
+                    </li>
+                    <li class="sliding-element" id="run-but" onclick="exec()">
+                        <a href="#"> <span class="icon_font"></span> Запустить </a>
+                    </li>
+                </ul>
+                <div class="ui-widget">
+                    <label style="color: #dddddd; margin: 10px">Введённое значение x:</label>
+                    <input type="text" id="InputArg" placeholder="x=" value="9">
+                </div>
             </div>
-        </div>
 
-        <div id="panel_flowchart">
-            <div id="myPaletteDiv"></div>
-            <div id="myDiagramDiv"></div>
-        </div>
+            <div id="panel_central">
+                <div id="panel_flowchart">
+                    <div id="myPaletteDiv"></div>
+                    <div id="myDiagramDiv"></div>
+                </div>
+                <div id="panel_message">
+                    Загрузите алгоритм для редактирования.
+                </div>
+            </div>
 
-        <div id="panel_right">
-            <!-- in this example the tree is populated from inline HTML -->
-            <ul>
-                <li>Root node 1
-                    <ul>
-                        <li id="child_node_1">Child node 1</li>
-                        <li>Child node 2</li>
-                    </ul>
-                </li>
-                <li>Root node 2</li>
-            </ul>
+            <div id="panel_right"></div>
         </div>
     </div>
 
-    <script>
-        $(function () {
-            // 6 create an instance when the DOM is ready
-            $('#panel_right').jstree();
-            // 7 bind to events triggered on the tree
-            $('#panel_right').on("changed.jstree", function (e, data) {
-                console.log(data.selected);
-            });
-        });
-    </script>
-
-    <script type="text/javascript" src="js/main.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/tree.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
