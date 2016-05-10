@@ -175,6 +175,7 @@ body
     height: 2em;
     margin-left: 10px;
     margin-right: 10px;
+    text-align: center;
 }
 
 #algorithm_info {
