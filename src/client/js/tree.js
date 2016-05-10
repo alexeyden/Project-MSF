@@ -8,8 +8,54 @@ $('#FindInput').keyup(function () {
 });
 
 tree_view = {
+    init : function() {
+        if($('#panel_right').jstree(true))
+            return;
+
+        $('#panel_right').jstree({
+            'core' : {
+                'themes' : {
+                    'name' : 'default-dark',
+                    'icons' : true
+                }
+            },
+            'plugins' : [ 'types', 'search', "conditionalselect" ],
+            'types' : {
+             'dir' : { 'icon' : 'octicon-file-directory' },
+             'file' : { 'icon' : 'octicon-file-code' }
+            },
+            "conditionalselect" : function(node, event) {
+                if(node.type == 'dir')
+                    return false;
+                return true;
+            }
+        });
+
+        $('#panel_right').on("changed.jstree", function (e, data) {
+            if(data.selected.length > 0) {
+                var info = data.instance.get_node(data.selected[0]);
+                tree_view.load(info.data.path);
+            }
+        });
+    },
+
+    load : function(path) {
+         $.jsonRPC.request('algorithm_fetch', {
+            params: [ path ],
+            id: server.token,
+
+            success: function(result) {
+                src = result.result.source;
+                load(src);
+            },
+            error: function(result) {
+                alert(JSON.stringify(result));
+            }
+        });
+    },
+
     update : function() {
-        $.jsonRPC.request('path_list', {
+       $.jsonRPC.request('path_list', {
             params: ['/', true],
             id: server.token,
 
@@ -22,6 +68,7 @@ tree_view = {
                         id : node.path,
                         text : node.name,
                         type : node.is_directory ? "dir" : "file",
+                        data : node,
                         children : []
                     };
 
@@ -38,23 +85,8 @@ tree_view = {
                     data_treejs.push(process(item));
                 });
 
-                $('#panel_right').jstree({
-                    'core' : {
-                        'data' : data_treejs,
-                        'themes' : {
-                            'name' : 'default-dark',
-                            'icons' : true
-                        }
-                    },
-                    'plugins' : [ 'types', 'search', "contextmenu" ],
-                    'types' : {
-                     'dir' : { 'icon' : 'octicon-file-directory' },
-                     'file' : { 'icon' : 'octicon-file-code' }
-                    }
-                });
-                $('#panel_right').on("changed.jstree", function (e, data) {
-                    console.log(data.selected);
-                });
+                $('#panel_right').jstree(true).settings.core.data = data_treejs;
+                $('#panel_right').jstree(true).refresh();
             },
             error: function(result) {
                 alert(JSON.stringify(result));

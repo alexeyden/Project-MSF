@@ -33,10 +33,16 @@ function slide(navigation_id, pad_out, pad_in, time, multiplier)
 		$(this).hover(
 		function()
 		{
+            if($(this).hasClass('disabled'))
+	    	    return;
+
 			$(this).animate({ paddingLeft: pad_out }, 150);
 		},
 		function()
 		{
+            if($(this).hasClass('disabled'))
+		        return;
+
 			$(this).animate({ paddingLeft: pad_in }, 150);
 		});
 	});

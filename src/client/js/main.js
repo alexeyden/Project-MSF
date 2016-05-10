@@ -1,46 +1,100 @@
 init();
 
-function save() {
-source = myDiagram.model.toJson();
+function load(src) {
+    myDiagram.model = go.Model.fromJson(src);
+    myDiagram.model.linkFromPortIdProperty = "fromPort";
+    myDiagram.model.linkToPortIdProperty = "toPort";
+    myPalette.layoutDiagram(true);
 
-alg = {
-    input_spec: ['x'],
-    output_spec: ['y'],
-    source: source
+    $('#panel_message').css("display", "none");
+    $('#panel_flowchart').css("display", "block");
 }
 
-$.jsonRPC.request('algorithm_update', {
-        params: ['/user1/Alg', alg],
-        id: server.token,
+function create() {
+    var template = '    { "class": "go.GraphLinksModel",       ' +
+    '      "linkFromPortIdProperty": "fromPort",' +
+    '      "linkToPortIdProperty": "toPort",    ' +
+    '      "nodeDataArray": [                   ' +
+    ' {"category":"Start", "text":"Начало", "key":-1, "loc":"-27.76666259765625 -339"}, ' +
+    ' {"category":"End", "text":"Конец", "key":-4, "loc":"-0.76666259765625 97"} ' +
+    '     ],                                    ' +
+    '      "linkDataArray": [                   ' +
+    '    ]}                                     ';
 
-        success: function(result) {
-            alert(JSON.stringify(result.result));
-        }
-});
+    load(template);
+}
+
+function save() {
+    source = myDiagram.model.toJson();
+
+    alg = {
+        input_spec: ['x'],
+        output_spec: ['y'],
+        source: source
+    }
+
+    $.jsonRPC.request('algorithm_update', {
+            params: ['/user1/Alg', alg],
+            id: server.token,
+
+            success: function(result) {
+                alert(JSON.stringify(result.result));
+            }
+    });
 }
 
 function exec() {
-var x = parseFloat(document.getElementById('InputArg').value);
+    /*
+    $.magnificPopup.open({
+        items: {
+            type: 'inline',
+            src: "#popup-start"
+        }
+    });
+    $(document).on('click', '.popup-modal-cancel', function (e) {
+        e.preventDefault();
+        $.magnificPopup.close();
+    });
+    */
 
-$.jsonRPC.request('algorithm_exec', {
-    params: ['/user1/Alg', {x:x}],
-    id: server.token,
-
-    success: function(result) {
-        alert("Результат: " + JSON.stringify(result.result.y));
+   show_msg_ok({
+    title: "Press ok",
+    text: "<b>Please</b> press ok!",
+    onOk: function() {
+        console.log("fine!");
     }
-});
+   });
+
+    /*
+    var x = parseFloat(document.getElementById('InputArg').value);
+
+    $.jsonRPC.request('algorithm_exec', {
+        params: ['/user1/Alg', {x:x}],
+        id: server.token,
+
+        success: function(result) {
+            alert("Результат: " + JSON.stringify(result.result.y));
+        }
+    });
+    */
 }
 
-function toggle_menu() {
-  var item = document.getElementById("panel_menu");
+function show_msg_ok(params) {
+    $.magnificPopup.open({
+        items: {
+            type: 'inline',
+            src: "#popup-msg-ok"
+        }
+    });
 
-  if(item.classList.contains('hide_menu')) {
-    item.classList.remove('hide_menu');
-    item.classList.add('show_menu');
-  }
-  else {
-    item.classList.remove('show_menu');
-    item.classList.add('hide_menu');
-  }
+    $("#popup-msg-ok-title").html(params.title);
+    $("#popup-msg-ok-text").html(params.text);
+
+    $(document).off('click', '.popup-modal-ok');
+    $(document).on('click', '.popup-modal-ok', function (e) {
+        e.preventDefault();
+        $.magnificPopup.close();
+
+        params.onOk();
+    });
 }

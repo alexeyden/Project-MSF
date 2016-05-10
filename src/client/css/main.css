@@ -40,6 +40,7 @@ body
 
 #main_panel {
     display: none;
+    height: 100%;
 }
 
 #auth_logo {
@@ -156,28 +157,46 @@ body
     width: 100%;
 }
 
-#mySavedModel{
-    display: none;
-}
 #myPaletteDiv{
     position: relative;
-    background-color: white;
-    box-sizing: border-box;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    height: 500px;
-    width:18%;
+    width:20%;
     overflow: auto;
     float: left;
+    height: 15em;
 }
+#panel_flowchart {
+    height: 100%;
+    position: relative;
+}
+
+.alg_title {
+    float: left;
+    width: calc(20% - 10px - 10px);
+    height: 2em;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#algorithm_info {
+    float: right;
+    width: calc(78% - 5px);
+    height: 2em;
+    clear: right;
+    margin: 0px;
+    margin-bottom: 5px;
+    padding: 0px;
+    padding-left: 5px;
+    background: #fff;
+    border: none;
+    border-bottom: 2px solid #14142a;
+}
+
 #myDiagramDiv{
     position: relative;
-    background-color: white;
-    box-sizing: border-box;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    width:80%;
-    height: 500px;
+    background: #fff;
+    border-bottom: 4px solid #14142a;
+    width:78%;
+    height: calc(100% - 2em - 5px);
     float: right;
     margin: 0px;
 }
@@ -217,7 +236,7 @@ body
     vertical-align: top;
     background: #fff;
     border: none;
-    border-bottom: 2px solid #a0a0a0;
+    border-bottom: 2px solid #80475e;
     padding: 5px;
 }
 
@@ -298,12 +317,16 @@ ul#sliding-navigation li.sliding-element a
     background: #cc5a71;
     border: 1px solid #80475e;
     border-bottom: 4px solid #80475e;
-    text-decoration: none;
     font-size: 12pt;
+    text-decoration: none;
     text-shadow: 0px 1px #80475e;
 }
 
-ul#sliding-navigation li.sliding-element a:hover {
+ul#sliding-navigation li.sliding-element a.disabled {
+    opacity: 0.3;
+}
+
+ul#sliding-navigation li.sliding-element a:not(.disabled):hover {
     color: #fff;
     background: #dc6a81;
 }
@@ -327,6 +350,10 @@ html, body {
     margin-right: 5px;
     color: #fff;
     text-shadow: 0px 3px #80475e;
+}
+
+#edit-but {
+
 }
 
 #user {
@@ -372,8 +399,10 @@ div#panel_top {
 
 div#panel_content {
   width: 100%;
-  height: calc(100% - 2em - 20px);
+  height: calc(100% - 2em - 50px);
   display: flex;
+  align-items: stretch;
+  flex-direction: row;
 }
 
 .icon_font {
@@ -388,13 +417,14 @@ div#panel_menu {
 
 div#panel_central {
   flex: 1 1 auto;
+  padding-right: 10px;
 }
 
 div#panel_message {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: 60%;
 }
 
 div#panel_flowchart {
@@ -429,3 +459,6 @@ div#panel_menu.show_menu {
     font-style: normal;
     content: '\f016';
 }
+
+.octicon-chevron-down:before { content: '\f0a3'; font-family: Icons; font-style: normal;}
+.octicon-chevron-up:before { content: '\f0a2';  font-family: Icons; font-style: normal;}

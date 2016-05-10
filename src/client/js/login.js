@@ -23,68 +23,52 @@ if('user' in cookies && 'token' in cookies &&
     server.token = cookies.token;
 
     $(function() {
+        tree_view.init();
         tree_view.update();
         $("#user").html(server.user);
     });
 }
-else {
-    $("#auth_button").click(function() {
-        $("#auth_button").prop('disabled', true);
-        $("#auth_error").css('visibility', 'hidden');
 
-        var login = $('#auth_login').val();
-        var password = $('#auth_password').val();
+$("#auth_button").click(function() {
+    $("#auth_button").prop('disabled', true);
+    $("#auth_error").css('visibility', 'hidden');
 
-        $.jsonRPC.request('user_authorize', {
-            params: [login, password],
-            id: 'none',
+    var login = $('#auth_login').val();
+    var password = $('#auth_password').val();
 
-            success: function(result) {
-                server.user = login;
-                server.token = result.result;
+    $.jsonRPC.request('user_authorize', {
+        params: [login, password],
+        id: 'none',
 
-                document.getElementById("main_panel").style.display = "block";
-                document.getElementById("auth_panel").style.display = "none";
+        success: function(result) {
+            server.user = login;
+            server.token = result.result;
 
-                tree_view.update();
+            document.getElementById("main_panel").style.display = "block";
+            document.getElementById("auth_panel").style.display = "none";
 
-                /*
-                 $.jsonRPC.request('algorithm_fetch', {
-                    params: ['/user1/Alg'],
-                    id: server.token,
+            tree_view.init();
+            tree_view.update();
 
-                    success: function(result) {
-                        src = result.result.source;
-                        myDiagram.model = go.Model.fromJson(src);
-                    },
-                    error: function(result) {
-                        alert(JSON.stringify(result));
-                    }
-                });
+            $("#auth_button").prop('disabled', false);
 
+            document.cookie = "user=" + server.user;
+            document.cookie = "token=" + server.token;
 
-                */
-
-                $("#auth_button").prop('disabled', false);
-
-                document.cookie = "user=" + server.user;
-                document.cookie = "token=" + server.token;
-
-                $("#user").html(server.user);
-            },
-            error: function(result) {
-                if(result.error.code == 1) {
-                    $('#auth_error').css("visibility",'visible');
-                }
-                else {
-                    alert(JSON.stringify(result));
-                }
-
-                $("#auth_button").prop('disabled', false);
+            $("#user").html(server.user);
+        },
+        error: function(result) {
+            if(result.error.code == 1) {
+                $('#auth_error').css("visibility",'visible');
             }
-        });
+            else {
+                alert(JSON.stringify(result));
+            }
+
+            $("#auth_button").prop('disabled', false);
+        }
     });
-}
+});
 
 function logout() {
     server.user = '';

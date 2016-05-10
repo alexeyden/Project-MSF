@@ -7,10 +7,14 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
     <!-- Place faicon.ico in the root directory -->
 
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
     <link rel="stylesheet" href="css/jquery-ui.min.css">
     <link rel="stylesheet" href="css/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="css/jquery-ui.theme.min.css">
@@ -25,6 +29,35 @@
     <script src="js/flowchart.js"> </script>
 </head>
 <body>
+    <div id="popup-start" class="popup-window mfp-hide">
+        <p class="popup-title"> Запустить алгоритм </p>
+        <p>
+            You won't be able to dismiss this by usual means (escape or
+            click button), but you can close it programatically based on
+            user choices or actions.</p>
+        <p class="popup-buttons">
+            <a class="popup-modal-run popup-button" href="#">Запустить</a>
+            <a class="popup-modal-cancel popup-button" href="#">Отмена</a>
+        </p>
+    </div>
+
+    <div id="popup-msg-ok" class="popup-window mfp-hide">
+        <p id="popup-msg-ok-title" class="popup-title"> Информация </p>
+        <p id="popup-msg-ok-text"></p>
+        <p  class="popup-buttons">
+            <a class="popup-modal-ok popup-button" href="#">Закрыть</a>
+        </p>
+    </div>
+
+    <div id="popup-msg-yesno" class="popup-window mfp-hide">
+        <p id="popup-msg-yesno-title" class="popup-title"> Вопрос </p>
+        <p id="popup-msg-yesno-text"></p>
+        <p  class="popup-buttons">
+            <a class="popup-modal-yes popup-button" href="#">Да</a>
+            <a class="popup-modal-no popup-button" href="#">Нет</a>
+        </p>
+    </div>
+
     <div id="auth_panel">
         <span id="auth_logo"> Вход </span>
         <span id="auth_error"> Неверный логин/пароль! </span>
@@ -61,19 +94,16 @@
         <div id="panel_content">
             <div id="panel_menu">
                 <ul id="sliding-navigation">
-                    <li class="sliding-element" id="open-but" onclick="save()">
-                        <a href="#"> <span class="icon_font"></span> Открыть </a>
-                    </li>
-                    <li class="sliding-element" id="add-but" onclick="save()">
-                        <a href="#"> <span class="icon_font"></span> Добавить </a>
-                    </li>
                     <li class="sliding-element" id="edit-but">
-                        <a href="#"> <span class="icon_font"></span> Редактировать </a></li>
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Сохранить </a></li>
+                    <li class="sliding-element" id="add-dir-but" onclick="save()">
+                        <a href="#"> <span class="icon_font"></span> Создать папку </a>
+                    </li>
+                    <li class="sliding-element" id="add-but" onclick="create()">
+                        <a href="#"> <span class="icon_font"></span> Создать алгоритм </a>
+                    </li>
                     <li class="sliding-element" id="del-but">
                         <a href="#"> <span class="icon_font"></span> Удалить </a>
-                    </li>
-                    <li class="sliding-element" id="share-but">
-                        <a href="#"> <span class="icon_font"></span> Поделиться </a>
                     </li>
                     <li class="sliding-element" id="run-but" onclick="exec()">
                         <a href="#"> <span class="icon_font"></span> Запустить </a>
@@ -87,6 +117,10 @@
 
             <div id="panel_central">
                 <div id="panel_flowchart">
+
+
+                    <span class="alg_title">Блоки:</span>
+                    <input type="text" id="algorithm_info" placeholder="Название алгоритма">
                     <div id="myPaletteDiv"></div>
                     <div id="myDiagramDiv"></div>
                 </div>
@@ -101,6 +135,7 @@
 
     <script src="js/login.js"></script>
     <script src="js/tree.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

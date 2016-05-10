@@ -1,5 +1,4 @@
 function init() {
-    if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     myDiagram =
             $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
@@ -8,8 +7,13 @@ function init() {
                         allowDrop: true,  // must be true to accept drops from the Palette
                         "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
                         "LinkRelinked": showLinkLabel,
-                        "animationManager.duration": 800, // slightly longer than default (600ms) animation
-                        "undoManager.isEnabled": true  // enable undo & redo
+                        "SelectionDeleting" : function(e) {
+                            var it = e.subject.iterator;
+                            while(it.next()) {
+                                if(it.value.data.category == "Start")
+                                    e.cancel = true;
+                            }
+                        }
                     });
     // helper definitions for node templates
     function nodeStyle() {
@@ -56,7 +60,7 @@ function init() {
 
     // define the Node templates for regular nodes
     var lightText = 'whitesmoke';
-    myDiagram.nodeTemplateMap.add("",  // the default category
+    myDiagram.nodeTemplateMap.add("Act",  // the default category
             $(go.Node, "Spot", nodeStyle(),
                     // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
                     $(go.Panel, "Auto",
@@ -65,7 +69,7 @@ function init() {
                                     new go.Binding("figure", "figure")),
                             $(go.TextBlock,
                                     {
-                                        font: "bold 11pt Helvetica, Arial, sans-serif",
+                                        font: "bold 10pt Helvetica, Arial, sans-serif",
                                         stroke: lightText,
                                         margin: 8,
                                         maxSize: new go.Size(160, NaN),
@@ -76,8 +80,6 @@ function init() {
                     ),
                     // four named ports, one on each side:
                     makePort("T", go.Spot.Top, false, true),
-                    makePort("L", go.Spot.Left, true, true),
-                    makePort("R", go.Spot.Right, true, true),
                     makePort("B", go.Spot.Bottom, true, false)
             ));
     myDiagram.nodeTemplateMap.add("Start",
@@ -86,27 +88,44 @@ function init() {
                             $(go.Shape, "Circle",
                                     {minSize: new go.Size(40, 40), fill: "#79C900", stroke: null}),
                             $(go.TextBlock, "Start",
-                                    {font: "bold 11pt Helvetica, Arial, sans-serif", stroke: lightText},
+                                    {font: "bold 10pt Helvetica, Arial, sans-serif", stroke: lightText},
                                     new go.Binding("text"))
                     ),
-                    // three named ports, one on each side except the top, all output only:
-                    makePort("L", go.Spot.Left, true, false),
-                    makePort("R", go.Spot.Right, true, false),
                     makePort("B", go.Spot.Bottom, true, false)
             ));
+     myDiagram.nodeTemplateMap.add("Cond",
+        $(go.Node, "Spot", nodeStyle(),
+                $(go.Panel, "Auto",
+                        $(go.Shape, "Rectangle",
+                                    {fill: "#dc4a81", stroke: null},
+                                    new go.Binding("figure", "figure")),
+                        $(go.TextBlock,
+                                    {
+                                        font: "bold 10pt Helvetica, Arial, sans-serif",
+                                        stroke: lightText,
+                                        margin: 8,
+                                        maxSize: new go.Size(160, NaN),
+                                        wrap: go.TextBlock.WrapFit,
+                                        editable: true,
+                                        stroke: '#fff'
+                                    },
+                                    new go.Binding("text").makeTwoWay())
+                ),
+                makePort("T", go.Spot.Top, false, true),
+                makePort("L", go.Spot.Left, true, false),
+                makePort("R", go.Spot.Right, true, false)
+        ));
     myDiagram.nodeTemplateMap.add("End",
             $(go.Node, "Spot", nodeStyle(),
                     $(go.Panel, "Auto",
                             $(go.Shape, "Circle",
                                     {minSize: new go.Size(40, 40), fill: "#DC3C00", stroke: null}),
                             $(go.TextBlock, "End",
-                                    {font: "bold 11pt Helvetica, Arial, sans-serif", stroke: lightText},
+                                    {font: "bold 10pt Helvetica, Arial, sans-serif", stroke: lightText, editable: true},
                                     new go.Binding("text"))
                     ),
                     // three named ports, one on each side except the bottom, all input only:
-                    makePort("T", go.Spot.Top, false, true),
-                    makePort("L", go.Spot.Left, false, true),
-                    makePort("R", go.Spot.Right, false, true)
+                    makePort("T", go.Spot.Top, false, true)
             ));
     myDiagram.nodeTemplateMap.add("Comment",
             $(go.Node, "Auto", nodeStyle(),
@@ -119,7 +138,7 @@ function init() {
                                 wrap: go.TextBlock.WrapFit,
                                 textAlign: "center",
                                 editable: true,
-                                font: "bold 12pt Helvetica, Arial, sans-serif",
+                                font: "bold 10pt Helvetica, Arial, sans-serif",
                                 stroke: '#454545'
                             },
                             new go.Binding("text").makeTwoWay())
@@ -135,14 +154,7 @@ function init() {
                         relinkableFrom: true,
                         relinkableTo: true,
                         reshapable: true,
-                        resegmentable: true,
-                        // mouse-overs subtly highlight links:
-                        mouseEnter: function (e, link) {
-                            link.findObject("HIGHLIGHT").stroke = "rgba(30,144,255,0.2)";
-                        },
-                        mouseLeave: function (e, link) {
-                            link.findObject("HIGHLIGHT").stroke = "transparent";
-                        }
+                        resegmentable: true
                     },
                     new go.Binding("points").makeTwoWay(),
                     $(go.Shape,  // the highlight shape, normally transparent
@@ -156,12 +168,12 @@ function init() {
                             new go.Binding("visible", "visible").makeTwoWay(),
                             $(go.Shape, "RoundedRectangle",  // the label shape
                                     {fill: "#F8F8F8", stroke: null}),
-                            $(go.TextBlock, "Yes",  // the label
+                            $(go.TextBlock, "Да",  // the label
                                     {
                                         textAlign: "center",
                                         font: "10pt helvetica, arial, sans-serif",
                                         stroke: "#333333",
-                                        editable: true
+                                        name: "LABEL_TEXT"
                                     },
                                     new go.Binding("text").makeTwoWay())
                     )
@@ -170,6 +182,13 @@ function init() {
     // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
     function showLinkLabel(e) {
         var label = e.subject.findObject("LABEL");
+        var text = e.subject.findObject("LABEL_TEXT");
+
+        if(e.subject.fromPortId == "L")
+            text.text = "Нет";
+        else
+            text.text = "Да";
+
         if (label !== null) label.visible = (e.subject.fromNode.data.figure === "Diamond");
     }
 
@@ -180,14 +199,12 @@ function init() {
     myPalette =
             $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
                     {
-                        "animationManager.duration": 800, // slightly longer than default (600ms) animation
                         nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
                         model: new go.GraphLinksModel([  // specify the contents of the Palette
-                            {category: "Start", text: "Start"},
-                            {text: "Step"},
-                            {text: "???", figure: "Diamond"},
-                            {category: "End", text: "End"},
-                            {category: "Comment", text: "Comment"}
+                            {category: "Act", text: "Действие"},
+                            {category: "Cond", text: "Условие", figure: "Diamond" },
+                            {category: "End", text: "Конец"},
+                            {category: "Comment", text: "Комментарий"}
                         ])
                     });
 }
