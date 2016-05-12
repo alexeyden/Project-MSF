@@ -166,7 +166,6 @@ body
 }
 #panel_flowchart {
     height: 100%;
-    position: relative;
 }
 
 .alg_title {
@@ -419,6 +418,7 @@ div#panel_menu {
 div#panel_central {
   flex: 1 1 auto;
   padding-right: 10px;
+  height: 100%;
 }
 
 div#panel_message {
