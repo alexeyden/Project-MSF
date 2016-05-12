@@ -15,12 +15,6 @@ from .exceptions import *
 
 from algorithm.algorithm import Algorithm
 
-class os:
-    class path:
-        @staticmethod
-        def join(*args):
-            return "/".join(args)
-
 class FileInfo:
     def __init__(self, name, path, owner, shared, is_directory, can_write, can_read):
         self.name = name
@@ -49,8 +43,8 @@ class Storage:
             self.user = user_login
 
     def __init__(self, storage_path='data'):
-        users_config = os.path.join(storage_path, 'users.json')
-        roles_config = os.path.join(storage_path, 'roles.json')
+        users_config = self._path_join(storage_path, 'users.json')
+        roles_config = self._path_join(storage_path, 'roles.json')
 
         self.storage_path = storage_path
 
@@ -90,15 +84,15 @@ class Storage:
         result = []
 
         for item in contents:
-            if path == '/' and self.owner(os.path.join(path, item)) is None:
+            if path == '/' and self.owner(self._path_join(path, item)) is None:
                 continue
 
-            if self.exists(os.path.join(path, item), context):
-                item_path = os.path.join(path, item)
+            if self.exists(self._path_join(path, item), context):
+                item_path = self._path_join(path, item)
                 result.append(self.file_info(item_path, context))
 
                 if recursive and result[-1].is_directory:
-                    result[-1].children = self.list(os.path.join(path, item), context, recursive)
+                    result[-1].children = self.list(self._path_join(path, item), context, recursive)
 
         return result
 
@@ -309,7 +303,7 @@ class Storage:
 
         for user in self.users.all():
             if user.login not in items:
-                os.mkdir(os.path.join(self.storage_path, user.login))
+                os.mkdir(self._path_join(self.storage_path, user.login))
 
     @contextmanager
     def _lock_path(self, path, task):
@@ -332,5 +326,9 @@ class Storage:
     def _path_split(path):
         return [part for part in path.split('/') if part != '']
 
+    @staticmethod
+    def _path_join(*args):
+        return os.path.join(*args).replace('\\', '/')
+
     def _path_full(self, path, *args):
-        return os.path.join(self.storage_path, path[1:], *args)
+        return self._path_join(self.storage_path, path[1:], *args)
