@@ -15,6 +15,11 @@ from .exceptions import *
 
 from algorithm.algorithm import Algorithm
 
+class os:
+    class path:
+        @staticmethod
+        def join(*args):
+            return "/".join(args)
 
 class FileInfo:
     def __init__(self, name, path, owner, shared, is_directory, can_write, can_read):
