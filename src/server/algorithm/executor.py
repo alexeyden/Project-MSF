@@ -27,14 +27,19 @@ class Executor:
         }
 
         for var in args:
-            context.variables[var] = args.get(var)
+            if not var.startswith("@"):
+                context.readonly.append(var)
+                context.variables[var] = args.get(var)
 
         ev = Evaluator(alg.source, context)
         ev.eval()
 
         results = {}
 
-        if var in context.variables:
-            results[var] = context.variables.get(var)
+        for var in context.variables:
+            if var.startswith('@'):
+                results[var[1:]] = context.variables.get(var)
+
+        print(results)
 
         return results

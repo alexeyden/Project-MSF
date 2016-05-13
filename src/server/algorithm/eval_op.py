@@ -29,13 +29,13 @@ class MathError(CalcError):
 
 
 def number():     return _(r'\d*\.\d*|\d+')
-def symbol(): return _(r"[a-zA-Z]+")
-def function():   return _(r"[a-zA-Z]+"), "(", compare, ")"
+def symbol(): return _(r"[a-zA-Z_]+[0-9]*")
+def function():   return _(r"[a-zA-Z_]+[0-9]*"), "(", compare, ")"
 def factor():     return Optional(["+","-"]), [function, symbol, number , ("(", compare, ")")]
 def term():       return factor, ZeroOrMore(["*","/"], factor)
 def expression(): return term, ZeroOrMore(["+", "-"], term)
 def compare(): return expression, Optional(["<", ">", "=", "<=", ">="], expression)
-def assignment(): return _(r'[a-zA-Z]+'), ":=", compare
+def assignment(): return _(r'@?[a-zA-Z_]+[0-9]*'), ":=", compare
 def root():       return [OneOrMore(assignment), OneOrMore(compare)], EOF
 
 

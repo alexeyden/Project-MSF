@@ -89,6 +89,7 @@ function save() {
     }
 
     myDiagram.isModified = false;
+    $('#edit-but a').addClass("disabled")
 
     return true;
 }
@@ -97,7 +98,12 @@ function exec() {
    if($('#run-but a').hasClass("disabled"))
     return;
 
-    var variables = [];
+    if(!$('#edit-but a').hasClass("disabled")) {
+        if(!save())
+            return;
+    }
+
+    var variables = {};
     var text = "";
 
     var filterFloat = function (value) {
@@ -116,18 +122,21 @@ function exec() {
                 if(l.indexOf(":=") != -1) {
                     var parts = l.split(':=');
 
-                    if(parts.length == 2 && !isNaN(filterFloat(parts[1].trim())))
+                    if(!parts[0].trim().startsWith("@") && parts.length == 2 && !isNaN(filterFloat(parts[1].trim())))
                         variables[parts[0].trim()] = filterFloat(parts[1].trim());
                 }
             });
         }
     });
-    var template = '{name} = <input id="run_var_{name}" type="text" class="form_input" value="{value}"/> <br/>';
+    var template = '<tr>' +
+                    '<td>{name} =</td>' +
+                    '<td><input id="run_var_{name}" type="text" class="form_input" value="{value}"/>' +
+                    '</td></tr>';
     var html = "";
 
     for(var v in variables) {
         var html_item = template;
-        html_item = html_item.replace("/{name}/g", v);
+        html_item = html_item.replace(/\{name\}/g, v);
         html_item = html_item.replace("{value}", variables[v]);
         html += html_item;
     }
@@ -138,9 +147,10 @@ function exec() {
         id : "#popup-start",
         onYes: function() {
             for(var v in variables) {
-                variables[v] = parseFloat($('#var_run_' + v).val());
+                variables[v] = parseFloat($('#run_var_' + v).val());
             }
-
+            console.log(algorithm.path);
+            console.log(variables);
             $.jsonRPC.request('algorithm_exec', {
                 params: [algorithm.path, variables],
                 id: server.token,

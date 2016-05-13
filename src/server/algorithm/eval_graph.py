@@ -18,6 +18,7 @@ class Node:
 
 class EvalContext:
     def __init__(self):
+        self.readonly = []
         self.variables = dict()
         self.functions = dict()
 
@@ -50,7 +51,8 @@ class NodeEval:
 
             for op in ops:
                 name, val = ev.eval(op)
-                self.context.variables[name] = val
+                if name not in self.context.readonly:
+                    self.context.variables[name] = val
 
         elif self.node.kind == self.node.IF:
             op = self.node.op.replace('\n', ' ')

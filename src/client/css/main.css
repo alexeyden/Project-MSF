@@ -108,7 +108,14 @@ body
     border: none;
     border-bottom: 2px solid #14142a;
     padding: 5px;
-    width: 90%;
+    min-width: 10em;
+}
+
+#popup-start-text {
+    width: 100%;
+}
+#popup-start-text tr td:first-child {
+    text-align: right;
 }
 
 .popup-title {
