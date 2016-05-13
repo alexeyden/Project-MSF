@@ -38,6 +38,18 @@
         </p>
     </div>
 
+    <div id="popup-msg-create-dir" class="popup-window mfp-hide">
+        <p class="popup-title"> Создание директории </p>
+        <p> <b> Путь:</b> </p>
+        <p id="popup-msg-create-dir-path"> </p>
+        <p> <b> Имя:</b> </p>
+        <input id="popup-msg-create-dir-name" class="form_input" />
+        <p class="popup-buttons">
+            <a class="popup-modal-yes popup-button" href="#">Создать</a>
+            <a class="popup-modal-no popup-button" href="#">Отмена</a>
+        </p>
+    </div>
+
     <div id="popup-msg-ok" class="popup-window mfp-hide">
         <p id="popup-msg-ok-title" class="popup-title"> Информация </p>
         <p id="popup-msg-ok-text"></p>
@@ -108,13 +120,13 @@
                     <li class="sliding-element" id="edit-dir">
                         <a href="#" class="disabled" onclick="rename_dir()"> <span class="icon_font"></span> Переименовать </a>
                     </li>
-                    <li class="sliding-element" id="add-dir-but">
+                    <li class="sliding-element" id="add-dir-but" onclick="make_dir()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Создать папку </a>
                     </li>
                     <li class="sliding-element" id="add-but" onclick="create()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Создать алгоритм </a>
                     </li>
-                    <li class="sliding-element" id="del-but">
+                    <li class="sliding-element" id="del-but" onclick="del_path()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Удалить </a>
                     </li>
                     <li class="sliding-element" id="run-but" onclick="exec()">

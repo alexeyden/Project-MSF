@@ -1,6 +1,10 @@
 init();
 
-algorithm = {}
+algorithm = {
+    is_new: false
+}
+
+model_reload = false;
 
 /*!
  * Draggabilly PACKAGED v2.1.0
@@ -15,10 +19,80 @@ $('#algorithm_info').keyup(function () {
     $("#edit-but a").removeClass("disabled");
 });
 
+function make_dir() {
+    if(!$('#add-dir a').hasClass("disabled")) {
+        var sel = tree_view.selected();
+
+        show_msg_yesno_id({
+            id: "#popup-msg-create-dir",
+            onYes: function() {
+                $.jsonRPC.request('path_create', {
+                        params: [
+                            sel.path + '/' + $('#popup-msg-create-dir-name').val()
+                        ],
+                        id: server.token,
+
+                        success: function(result) {
+                            tree_view.update()
+                        },
+                        error: function(result) {
+                            if(result.error.code == 2) {
+                                show_msg_ok_id({
+                                    title : "Ошибка",
+                                    text : "Некорректное имя",
+                                    onOk : function() {}
+                                });
+                            } else {
+                                alert(JSON.stringify(result.error))
+                            }
+                        }
+                })
+            },
+            onNo: function() { }
+        });
+        $('#popup-msg-create-dir-path').html(sel.path + '/');
+        $('#popup-msg-create-dir-name').val('Новая папка');
+    }
+}
+
+function del_path() {
+    if($('#del-but a').hasClass("disabled"))
+        return true;
+
+    var sel = tree_view.selected();
+
+    $("#popup-msg-yesno-title").html("Удаление");
+    $("#popup-msg-yesno-text").html("Удалить выбранный путь: " + sel.path + "?");
+
+    show_msg_yesno_id({
+        id : "#popup-msg-yesno",
+        onYes : function() {
+            $.jsonRPC.request("path_remove", {
+                params: [sel.path],
+                id: server.token,
+                success: function(result) {
+                    tree_view.update();
+
+                    $('#edit-dir a').addClass('disabled');
+                    $("#run-but a").addClass("disabled");
+                    $("#del-but a").addClass("disabled");
+                    $("#add-but a").addClass("disabled");
+                    $("#add-dir-but a").addClass("disabled");
+                },
+                error: function(result) {
+                    alert(JSON.stringify(result.error));
+                }
+            });
+        },
+        onNo : function() {
+        }
+    });
+}
+
 function load(src) {
-    myDiagram.model = go.Model.fromJson(src);
     myDiagram.model.linkFromPortIdProperty = "fromPort";
     myDiagram.model.linkToPortIdProperty = "toPort";
+    myDiagram.model = go.Model.fromJson(src);
     myPalette.layoutDiagram(true);
 
     $('#panel_message').css("display", "none");
@@ -26,17 +100,47 @@ function load(src) {
 }
 
 function create() {
-    var template = '    { "class": "go.GraphLinksModel",       ' +
-    '      "linkFromPortIdProperty": "fromPort",' +
-    '      "linkToPortIdProperty": "toPort",    ' +
-    '      "nodeDataArray": [                   ' +
-    ' {"category":"Start", "text":"Начало", "key":-1, "loc":"-27.76666259765625 -339"}, ' +
-    ' {"category":"End", "text":"Конец", "key":-4, "loc":"-0.76666259765625 97"} ' +
-    '     ],                                    ' +
-    '      "linkDataArray": [                   ' +
-    '    ]}                                     ';
+    if($('#add-but a').hasClass("disabled"))
+        return true;
 
-    load(template);
+    $("#popup-msg-yesno-title").html("Сохранение");
+    $("#popup-msg-yesno-text").html("Текущий алгоритм не сохранен, изменения будут потеряны. Все равно продолжить?");
+
+    var do_create = function() {
+        var template = '    { "class": "go.GraphLinksModel",       ' +
+        '      "linkFromPortIdProperty": "fromPort",' +
+        '      "linkToPortIdProperty": "toPort",    ' +
+        '      "nodeDataArray": [                   ' +
+        ' {"category":"Start", "text":"Начало", "key":-1, "loc":"-27.76666259765625 -339"}, ' +
+        ' {"category":"End", "text":"Конец", "key":-4, "loc":"-0.76666259765625 97"} ' +
+        '     ],                                    ' +
+        '      "linkDataArray": [                   ' +
+        '    ]}                                     ';
+
+        load(template);
+
+        var source = myDiagram.model.toJson();
+        algorithm.source = source;
+        algorithm.name = "Новый алгоритм";
+        algorithm.path = tree_view.selected().path + '/' + algorithm.name;
+        algorithm.is_new = true;
+        $('#algorithm_info').val(algorithm.name);
+
+        model_reload = true;
+    }
+
+    if(!$('#edit-but a').hasClass("disabled")) {
+        show_msg_yesno_id({
+                id : "#popup-msg-yesno",
+                onYes : function() {
+                    do_create();
+                },
+                onNo : function() {
+                }
+            });
+    } else {
+        do_create();
+    }
 }
 
 function save() {
@@ -50,14 +154,17 @@ function save() {
     var new_path = algorithm.path.substr(0, algorithm.path.length - algorithm.name.length) + new_name;
 
     var do_save = function() {
-        $.jsonRPC.request('algorithm_update', {
+        var cmd = !algorithm.is_new ? 'algorithm_update' : 'algorithm_create';
+        $.jsonRPC.request(cmd, {
                         params: [new_path, algorithm],
                         id: server.token,
                         success: function(result) {}
         });
+        if(algorithm.is_new)
+            tree_view.update();
     }
 
-    if(new_name != algorithm.name) {
+    if(new_name != algorithm.name && !algorithm.is_new) {
         $.jsonRPC.request('path_move', {
             params: [
                 algorithm.path, new_path
@@ -78,7 +185,7 @@ function save() {
                         onOk : function() {}
                     });
                 } else {
-                    alert(JSON.stringify(result.error))
+                    alert(JSON.stringify(result.error));
                 }
 
                 return false;

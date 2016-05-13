@@ -26,9 +26,9 @@ class Algorithm:
     @staticmethod
     def from_dict(js):
         if 'input_spec' not in js:
-            raise AlgorithmDecodeError('No input_spec', js)
+            js['input_spec'] = []
         if 'output_spec' not in js:
-            raise AlgorithmDecodeError('No output spec', js)
+            js['output_spec'] = []
         if 'source' not in js:
             raise AlgorithmDecodeError('No source', js)
         if type(js['input_spec']) != list:

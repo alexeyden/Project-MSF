@@ -63,6 +63,7 @@ tree_view = {
 
                 algorithm = result.result;
                 algorithm.path = path;
+                algorithm.is_new = false;
 
                 $('#algorithm_info').val(algorithm.name)
 

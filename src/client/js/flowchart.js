@@ -16,13 +16,16 @@ function init() {
                         }
                     });
     myDiagram.addDiagramListener("Modified", function(e) {
-      if(myDiagram.isModified) {
+      if(myDiagram.isModified || !myDiagram.isModified && model_reload) {
+        if(!myDiagram.isModified && model_reload)
+            model_reload = false;
         jQuery("#edit-but a").removeClass("disabled");
       }
       else {
         jQuery("#edit-but a").addClass("disabled");
       }
     });
+
 
     // helper definitions for node templates
     function nodeStyle() {
