@@ -27,12 +27,14 @@
     <div id="popup-start" class="popup-window mfp-hide">
         <p class="popup-title"> Запустить алгоритм </p>
         <p>
-            You won't be able to dismiss this by usual means (escape or
-            click button), but you can close it programatically based on
-            user choices or actions.</p>
+            <b>Входные значения:</b>
+        </p>
+        <p id="popup-start-text">
+
+        </p>
         <p class="popup-buttons">
-            <a class="popup-modal-run popup-button" href="#">Запустить</a>
-            <a class="popup-modal-cancel popup-button" href="#">Отмена</a>
+            <a class="popup-modal-yes popup-button" href="#">Запустить</a>
+            <a class="popup-modal-no popup-button" href="#">Отмена</a>
         </p>
     </div>
 
@@ -101,7 +103,7 @@
         <div id="panel_content">
             <div id="panel_menu">
                 <ul id="sliding-navigation">
-                    <li class="sliding-element" id="edit-but">
+                    <li class="sliding-element" id="edit-but" onclick="save()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Сохранить </a></li>
                     <li class="sliding-element" id="edit-dir">
                         <a href="#" class="disabled" onclick="rename_dir()"> <span class="icon_font"></span> Переименовать </a>

@@ -174,7 +174,7 @@ body
     width:20%;
     overflow: auto;
     float: left;
-    height: 15em;
+    height: calc(100% - 2em - 5px);
 }
 #panel_flowchart {
     height: 100%;

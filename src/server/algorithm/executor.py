@@ -34,8 +34,7 @@ class Executor:
 
         results = {}
 
-        for var in alg.output_spec:
-            if var in context.variables:
-                results[var] = context.variables.get(var)
+        if var in context.variables:
+            results[var] = context.variables.get(var)
 
         return results

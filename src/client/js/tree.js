@@ -32,6 +32,7 @@ tree_view = {
                 if(!info.data.is_directory) {
                     $('#edit-dir a').addClass('disabled');
                     $("#run-but a").removeClass("disabled");
+                    jQuery("#del-but a").removeClass("disabled");
                     jQuery("#add-but a").addClass("disabled");
                     jQuery("#add-dir-but a").addClass("disabled");
 
@@ -59,6 +60,12 @@ tree_view = {
 
             success: function(result) {
                 src = result.result.source;
+
+                algorithm = result.result;
+                algorithm.path = path;
+
+                $('#algorithm_info').val(algorithm.name)
+
                 load(src);
             },
             error: function(result) {
