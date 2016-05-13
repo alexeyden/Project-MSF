@@ -15,6 +15,15 @@ function init() {
                             }
                         }
                     });
+    myDiagram.addDiagramListener("Modified", function(e) {
+      if(myDiagram.isModified) {
+        jQuery("#edit-but a").removeClass("disabled");
+      }
+      else {
+        jQuery("#edit-but a").addClass("disabled");
+      }
+    });
+
     // helper definitions for node templates
     function nodeStyle() {
         return [
@@ -167,7 +176,7 @@ function init() {
                             {visible: false, name: "LABEL", segmentIndex: 2, segmentFraction: 0.5},
                             new go.Binding("visible", "visible").makeTwoWay(),
                             $(go.Shape, "RoundedRectangle",  // the label shape
-                                    {fill: "#F8F8F8", stroke: null}),
+                                    {fill: "#FFF", stroke: null}),
                             $(go.TextBlock, "Да",  // the label
                                     {
                                         textAlign: "center",
@@ -213,6 +222,7 @@ function showPorts(node, show) {
     var diagram = node.diagram;
     if (!diagram || diagram.isReadOnly || !diagram.allowLink) return;
     node.ports.each(function (port) {
-        port.stroke = (show ? "white" : null);
+        port.stroke = (show) ? "#a0a0a0" : null;
+        port.fill = (show) ? "white" : "transparent";
     });
 }

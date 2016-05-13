@@ -19,7 +19,7 @@ tree_view = {
                     'icons' : true
                 }
             },
-            'plugins' : [ 'types', 'search', "conditionalselect" ],
+            'plugins' : [ 'types', 'search' ],
             'types' : {
              'dir' : { 'icon' : 'octicon-file-directory' },
              'file' : { 'icon' : 'octicon-file-code' }
@@ -34,7 +34,21 @@ tree_view = {
         $('#panel_right').on("changed.jstree", function (e, data) {
             if(data.selected.length > 0) {
                 var info = data.instance.get_node(data.selected[0]);
-                tree_view.load(info.data.path);
+                if(!info.data.is_directory) {
+                    $('#edit-dir a').addClass('disabled');
+                    $("#run-but a").removeClass("disabled");
+                    jQuery("#add-but a").addClass("disabled");
+                    jQuery("#add-dir-but a").addClass("disabled");
+
+                    tree_view.load(info.data.path);
+                }
+                else {
+                    $('#edit-dir a').removeClass("disabled");
+                    jQuery("#add-but a").removeClass("disabled");
+                    jQuery("#add-dir-but a").removeClass("disabled");
+                    jQuery("#del-but a").removeClass("disabled");
+                    jQuery("#run-but a").addClass("disabled");
+                }
             }
         });
     },

@@ -115,6 +115,12 @@ function exec() {
     */
 }
 
+function rename_dir() {
+    if(!$('#edit-dir a').hasClass("disabled")) {
+        alert('rename');
+    }
+}
+
 function show_msg_ok(params) {
     $.magnificPopup.open({
         items: {

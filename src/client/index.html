@@ -22,7 +22,6 @@
     <script src="js/go.js"></script>
     <script src="js/jstree.min.js"></script>
     <script src="js/jquery.jsonrpc.js"></script>
-    <script src="js/flowchart.js"> </script>
 </head>
 <body>
     <div id="popup-start" class="popup-window mfp-hide">
@@ -51,6 +50,16 @@
         <p  class="popup-buttons">
             <a class="popup-modal-yes popup-button" href="#">Да</a>
             <a class="popup-modal-no popup-button" href="#">Нет</a>
+        </p>
+    </div>
+
+    <div id="popup-msg-rename" class="popup-window mfp-hide">
+        <p class="popup-title"> Переименование директории </p>
+        <p> Переименовать директорию <span id="popup-msg-rename-path"></span>: </p>
+        <input class="auth_input" />
+        <p class="popup-buttons">
+            <a class="popup-modal-yes popup-button" href="#">Переименовать</a>
+            <a class="popup-modal-no popup-button" href="#">Отмена</a>
         </p>
     </div>
 
@@ -91,24 +100,23 @@
             <div id="panel_menu">
                 <ul id="sliding-navigation">
                     <li class="sliding-element" id="edit-but">
-                        <a href="#" class="disabled"> <span class="icon_font"></span> Сохранить </a></li>
-                    <li class="sliding-element" id="add-dir-but" onclick="save()">
-                        <a href="#"> <span class="icon_font"></span> Создать папку </a>
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Сохранить </a></li>
+                    <li class="sliding-element" id="edit-dir">
+                        <a href="#" class="disabled" onclick="rename_dir()"> <span class="icon_font"></span> Переименовать </a>
+                    </li>
+                    <li class="sliding-element" id="add-dir-but">
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Создать папку </a>
                     </li>
                     <li class="sliding-element" id="add-but" onclick="create()">
-                        <a href="#"> <span class="icon_font"></span> Создать алгоритм </a>
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Создать алгоритм </a>
                     </li>
                     <li class="sliding-element" id="del-but">
-                        <a href="#"> <span class="icon_font"></span> Удалить </a>
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Удалить </a>
                     </li>
                     <li class="sliding-element" id="run-but" onclick="exec()">
-                        <a href="#"> <span class="icon_font"></span> Запустить </a>
+                        <a href="#" class="disabled"> <span class="icon_font"></span> Запустить </a>
                     </li>
                 </ul>
-                <div class="ui-widget">
-                    <label style="color: #dddddd; margin: 10px">Введённое значение x:</label>
-                    <input type="text" id="InputArg" placeholder="x=" value="9">
-                </div>
             </div>
 
             <div id="panel_central">
@@ -132,6 +140,7 @@
     <script src="js/login.js"></script>
     <script src="js/tree.js"></script>
     <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/flowchart.js"> </script>
     <script src="js/main.js"></script>
 </body>
 </html>
