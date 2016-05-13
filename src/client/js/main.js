@@ -117,8 +117,72 @@ function exec() {
 
 function rename_dir() {
     if(!$('#edit-dir a').hasClass("disabled")) {
-        alert('rename');
+        var sel = tree_view.selected();
+
+        show_msg_yesno_id({
+            id: "#popup-msg-rename",
+            onYes: function() {
+                $.jsonRPC.request('path_move', {
+                        params: [
+                            sel.path,
+                            sel.path.substr(0, sel.path.length - sel.name.length) + $('#popup-msg-rename-name').val()
+                        ],
+                        id: server.token,
+
+                        success: function(result) {
+                            tree_view.update()
+                        },
+                        error: function(result) {
+                            if(result.error.code == 2) {
+                                show_msg_ok({
+                                    id : "show_msg_ok",
+                                    title : "Ошибка",
+                                    text : "Новое имя некорректно",
+                                    onOk : function() {}
+                                });
+                            } else {
+                                alert(JSON.stringify(result.error))
+                            }
+                        }
+                })
+            },
+            onNo: function() { }
+        });
+        $('#popup-msg-rename-path').html(sel.path);
+        $('#popup-msg-rename-name').val(sel.name);
     }
+}
+
+function show_msg_yesno_id(params) {
+    $.magnificPopup.open({
+        items: {
+            type: 'inline',
+            src: params.id
+        }
+    });
+
+    var $draggable = $(params.id).draggabilly({
+      containment: 'body',
+      handle: '.popup-title'
+    })
+
+    $(document).off('click', params.id + ' .popup-modal-yes');
+    $(document).off('click', params.id + ' .popup-modal-no');
+
+    $(document).on('click', params.id + ' .popup-modal-yes', function (e) {
+        e.preventDefault();
+        $.magnificPopup.close();
+        $draggable.draggabilly('destroy');
+
+        params.onYes();
+    });
+    $(document).on('click', params.id + ' .popup-modal-no', function (e) {
+        e.preventDefault();
+        $.magnificPopup.close();
+        $draggable.draggabilly('destroy');
+
+        params.onNo();
+    });
 }
 
 function show_msg_ok(params) {
@@ -130,7 +194,8 @@ function show_msg_ok(params) {
     });
 
     var $draggable = $('#popup-msg-ok').draggabilly({
-      containment: 'body'
+      containment: 'body',
+      handle: '.popup-window'
     })
 
     $("#popup-msg-ok-title").html(params.title);

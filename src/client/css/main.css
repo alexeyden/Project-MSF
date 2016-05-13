@@ -103,6 +103,18 @@ body
     width: 5em;
 }
 
+.form_input {
+    background: #fff;
+    border: none;
+    border-bottom: 2px solid #14142a;
+    padding: 5px;
+    width: 90%;
+}
+
+.popup-title {
+    cursor: pointer;
+}
+
 .MainWindow{
     position:relative;
     max-width: 1200px;

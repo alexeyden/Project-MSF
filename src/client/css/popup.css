@@ -12,6 +12,9 @@
 
 .popup-title {
     font-size: 14pt;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #14142a;
 }
 
 p.popup-buttons > a.popup-button {

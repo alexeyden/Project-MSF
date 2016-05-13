@@ -23,11 +23,6 @@ tree_view = {
             'types' : {
              'dir' : { 'icon' : 'octicon-file-directory' },
              'file' : { 'icon' : 'octicon-file-code' }
-            },
-            "conditionalselect" : function(node, event) {
-                if(node.type == 'dir')
-                    return false;
-                return true;
             }
         });
 
@@ -51,6 +46,10 @@ tree_view = {
                 }
             }
         });
+    },
+
+    selected : function() {
+        return $('#panel_right').jstree('get_node', $('#panel_right').jstree('get_selected')[0]).data;
     },
 
     load : function(path) {
