@@ -250,11 +250,51 @@ function exec() {
 
     $('#popup-start-text').html(html);
 
+    var IsOutValue = false;
     show_msg_yesno_id({
         id : "#popup-start",
         onYes: function() {
-            for(var v in variables) {
+            nodes.forEach(function(n) {
+            if(n.category == "Act") {
+                var lines = n.text.split('\n');
+
+                lines.forEach(function(l) {
+                    if(l.indexOf(":=") != -1) {
+                        var parts = l.split(':=');
+                        if(parts[0].trim().startsWith("@")){
+                            IsOutValue = true;
+                            console.log("IsOutValue = " + IsOutValue);
+                        }
+                    }
+                });
+            }
+        });
+
+            for (var v in variables) {
                 variables[v] = parseFloat($('#run_var_' + v).val());
+                console.log("!!!!!!" + v + "variables[v] = " + variables[v]);
+                source = myDiagram.model.nodeDataArray;
+                console.log(source);
+                if(isNaN(variables[v])){
+                    console.log('Ошибка: введено некорректное значение');
+                    var html = '';
+                    show_msg_ok_id({
+                                    title : "Ошибка",
+                                    text : "Введено некорректное значение",
+                                    onOk : function() {}
+                    });
+                return;
+                }
+                else if (IsOutValue == false){
+                    console.log('Ошибка: не заданна переменная для вывода');
+                    var html = '';
+                    show_msg_ok_id({
+                                    title : "Ошибка",
+                                    text : "Не заданна переменная для вывода(используйте @)",
+                                    onOk : function() {}
+                    });
+                return;
+                }
             }
             console.log(algorithm.path);
             console.log(variables);
@@ -267,7 +307,9 @@ function exec() {
 
                     for(var v in result.result)
                         html += v + " = " + result.result[v] + " <br/>";
-
+                        if(html == ''){
+                            html = "Возможно вы не определили переменную для вывода(используйте @)"
+                        }
                     show_msg_ok_id({
                                     title : "Результат",
                                     text : html,
@@ -275,13 +317,15 @@ function exec() {
                                 });
                 },
                 error: function(result) {
-                    alert('Ошибка: ' + JSON.stringify(result.error))
+                    console.log('Ошибка: ' + JSON.stringify(result.error))
                 }
             });
         },
         onNo: function() {}
     });
 }
+
+
 
 function rename_dir() {
     if(!$('#edit-dir a').hasClass("disabled")) {
