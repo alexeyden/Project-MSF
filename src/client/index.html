@@ -104,10 +104,10 @@
             <span id="SiteName"> Алгоритмы </span>
             <input type="text" id="FindInput" placeholder="Поиск алгоритма">
 
-            <span id="user_exit">
+            <span id="user_exit" data-title="Выход/Смена пользователя">
                 
             </span>
-            <span id="user">
+            <span id="user" data-title="Имя пользователя">
                 UserName
             </span>
         </div>
@@ -115,21 +115,21 @@
         <div id="panel_content">
             <div id="panel_menu">
                 <ul id="sliding-navigation">
-                    <li class="sliding-element" id="edit-but" onclick="save()">
+                    <li class="sliding-element" id="edit-but" data-title="Сохранить созданный алгоритм или обновить существующий" onclick="save()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Сохранить </a></li>
-                    <li class="sliding-element" id="edit-dir">
+                    <li class="sliding-element" id="edit-dir" data-title="Переименовать папку">
                         <a href="#" class="disabled" onclick="rename_dir()"> <span class="icon_font"></span> Переименовать </a>
                     </li>
-                    <li class="sliding-element" id="add-dir-but" onclick="make_dir()">
+                    <li class="sliding-element" id="add-dir-but" data-title="Создать новую папку в текущей директории" onclick="make_dir()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Создать папку </a>
                     </li>
-                    <li class="sliding-element" id="add-but" onclick="create()">
+                    <li class="sliding-element" id="add-but" data-title="Создать новый алгоритм" onclick="create()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Создать алгоритм </a>
                     </li>
-                    <li class="sliding-element" id="del-but" onclick="del_path()">
+                    <li class="sliding-element" id="del-but" data-title="Удалить выделенную папку или алгоритм" onclick="del_path()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Удалить </a>
                     </li>
-                    <li class="sliding-element" id="run-but" onclick="exec()">
+                    <li class="sliding-element" id="run-but" data-title="Запуск выделенного алгоритма" onclick="exec()">
                         <a href="#" class="disabled"> <span class="icon_font"></span> Запустить </a>
                     </li>
                 </ul>
@@ -140,7 +140,7 @@
 
 
                     <span class="alg_title">Блоки</span>
-                    <input type="text" id="algorithm_info" placeholder="Название алгоритма">
+                    <input type="text" id="algorithm_info" data-title="Имя алгоритма" placeholder="Название алгоритма">
                     <div id="myPaletteDiv"></div>
                     <div id="myDiagramDiv"></div>
                 </div>
