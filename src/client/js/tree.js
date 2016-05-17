@@ -17,12 +17,37 @@ tree_view = {
                 'themes' : {
                     'name' : 'default-dark',
                     'icons' : true
+                },
+                "check_callback" : function(op, node, parent, pos, more) {
+                    if(op == 'move_node') {
+                        if(parent.id == '#')
+                            return false;
+
+                        var parts_node = node.data.path.split('/');
+                        var parts_parent = parent.data.path.split('/');
+
+                        if(parts_node.length < 2 || parts_parent.length < 2 || parts_node[1] != parts_parent[1])
+                            return false;
+
+                        return true;
+                    }
+                    else return true;
                 }
             },
-            'plugins' : [ 'types', 'search' ],
+            'plugins' : [ 'types', 'search', 'dnd' ],
             'types' : {
              'dir' : { 'icon' : 'octicon-file-directory' },
              'file' : { 'icon' : 'octicon-file-code' }
+            },
+            "dnd": {
+                "copy" : false,
+                "is_draggable": function(nodes, ev) {
+                    for(var i = 0; i < nodes.length; i++) {
+                        if(nodes[i].data.path.split('/').length < 3)
+                            return false;
+                    }
+                    return true;
+                }
             }
         });
 
