@@ -355,7 +355,7 @@ function rename_dir() {
                                 alert(JSON.stringify(result.error))
                             }
                         }
-                })
+                });
             },
             onNo: function() { }
         });

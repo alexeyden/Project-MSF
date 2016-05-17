@@ -18,9 +18,13 @@ tree_view = {
                     'name' : 'default-dark',
                     'icons' : true
                 },
+                "multiple" : false,
                 "check_callback" : function(op, node, parent, pos, more) {
                     if(op == 'move_node') {
                         if(parent.id == '#')
+                            return false;
+
+                        if(!parent.data.is_directory)
                             return false;
 
                         var parts_node = node.data.path.split('/');
@@ -71,6 +75,34 @@ tree_view = {
                     jQuery("#run-but a").addClass("disabled");
                 }
             }
+        });
+
+        $("#panel_right").on("move_node.jstree", function(e, data) {
+            console.log(e, data)
+            $.jsonRPC.request('path_move', {
+                        params: [
+                            data.new_instance.get_node(data.node).data.path,
+                            data.new_instance.get_node(data.parent).data.path + '/' +
+                                data.new_instance.get_node(data.node).data.name
+                        ],
+                        id: server.token,
+
+                        success: function(result) {
+                            tree_view.update()
+                        },
+                        error: function(result) {
+                            if(result.error.code == 2) {
+                                show_msg_ok_id({
+                                    title : "Ошибка",
+                                    text : "Невозможно переместить в эту папку!",
+                                    onOk : function() {}
+                                });
+                                tree_view.update();
+                            } else {
+                                alert(JSON.stringify(result.error))
+                            }
+                        }
+                });
         });
     },
 
