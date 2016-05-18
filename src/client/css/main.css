@@ -179,9 +179,9 @@ body
 #myPaletteDiv{
     position: relative;
     width:20%;
-    overflow: auto;
     float: left;
     height: calc(100% - 2em - 5px);
+    overflow: hidden;
 }
 #panel_flowchart {
     height: 100%;
@@ -495,6 +495,7 @@ div#panel_message {
 
 div#panel_flowchart {
   display: none;
+  overflow: hidden;
 }
 
 div#panel_right {

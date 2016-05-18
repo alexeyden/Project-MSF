@@ -12,6 +12,7 @@ class CalcError(Exception):
 class NotDefinedError(CalcError):
     def __init__(self, msg, symbol, position, *args, **kwargs):
         super().__init__(msg, symbol, position, *args, **kwargs)
+        self.msg = msg
         self.symbol = symbol
         self.position = position
 
@@ -19,12 +20,14 @@ class NotDefinedError(CalcError):
 class ParseError(CalcError):
     def __init__(self, msg, position, *args, **kwargs):
         super().__init__(msg, position, *args, **kwargs)
+        self.msg = msg
         self.position = position
 
 
 class MathError(CalcError):
     def __init__(self, msg, position, *args, **kwargs):
         super().__init__(msg, position, *args, **kwargs)
+        self.msg = msg
         self.position = position
 
 
@@ -35,7 +38,7 @@ def factor():     return Optional(["+","-"]), [function, symbol, number , ("(", 
 def term():       return factor, ZeroOrMore(["*","/"], factor)
 def expression(): return term, ZeroOrMore(["+", "-"], term)
 def compare(): return expression, Optional(["<", ">", "=", "<=", ">="], expression)
-def assignment(): return _(r'@?[a-zA-Z_]+[0-9]*'), ":=", compare
+def assignment(): return _(r'[a-zA-Z_]+[0-9]*'), ":=", compare
 def root():       return [OneOrMore(assignment), OneOrMore(compare)], EOF
 
 
@@ -51,12 +54,12 @@ class CalcVisitor(PTNodeVisitor):
     def visit_function(self, node, children):
         if children[0] in self.env_func:
             return self.env_func[children[0]](children[1])
-        raise NotDefinedError('Function not defined', node.flat_str(), node.position)
+        raise NotDefinedError('Функция {0} не определена'.format(node.flat_str()), node.flat_str(), node.position)
 
     def visit_symbol(self, node, children):
         if node.value in self.env_var:
             return self.env_var[node.value]
-        raise NotDefinedError('Variable not defined', node.value, node.position)
+        raise NotDefinedError('Переменная {0} не определена'.format(node.value), node.value, node.position)
 
     def visit_number(self, node, children):
         return float(node.value)
@@ -115,6 +118,7 @@ class Evaluator:
         try:
             tree = self._parser.parse(expr)
         except NoMatch as err:
-            raise ParseError(err, err.position) from err
+            msg = '{0} (позиция {1})'.format(err.parser.context(err.position), err.position);
+            raise ParseError(msg, err.position) from err
 
         return visit_parse_tree(tree, CalcVisitor(self._variables, self._functions))

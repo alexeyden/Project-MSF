@@ -30,6 +30,9 @@ tree_view = {
                         var parts_node = node.data.path.split('/');
                         var parts_parent = parent.data.path.split('/');
 
+                        if(parts_node.length == parts_parent.length + 1 && node.data.path.startsWith(parent.data.path))
+                            return false;
+
                         if(parts_node.length < 2 || parts_parent.length < 2 || parts_node[1] != parts_parent[1])
                             return false;
 
@@ -72,7 +75,6 @@ tree_view = {
                     jQuery("#add-but a").removeClass("disabled");
                     jQuery("#add-dir-but a").removeClass("disabled");
                     jQuery("#del-but a").removeClass("disabled");
-                    jQuery("#run-but a").addClass("disabled");
                 }
             }
         });

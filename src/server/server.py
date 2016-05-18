@@ -12,6 +12,7 @@ from storage.storage import Storage
 from storage.exceptions import *
 from algorithm.algorithm import *
 from algorithm.executor import Executor
+from algorithm.exceptions import *
 from exceptions import *
 
 jsonrpc_method = jsonrpc.Dispatcher.remote_method
@@ -102,25 +103,20 @@ class Server:
         except NoSuchPathError as err:
             raise RpcNoSuchPathError("Нет такого файла", path) from err
 
-    @jsonrpc_method(str, dict)
-    async def algorithm_exec(self, path, args):
-        self._log('algorithm_fetch({0}, {1})'.format(path, args))
+    @jsonrpc_method(dict, dict)
+    async def algorithm_exec(self, alg, args):
+        self._log('algorithm_exec({0}, {1})'.format("alg", args))
 
         context = self._context()
 
         try:
-            self._log("  fetching algorithm")
-            alg = await self.storage.file_read(path, context)
-
             self._log("  executing algorithm")
-            result = await self.executor.run(alg, args)
+            result = await self.executor.run(Algorithm.from_dict(alg), args)
 
             self._log("return: result: {0}".format(result))
             return result
-        except InvalidPathError as err:
-            raise RpcInvalidPathError("Неверный путь", path) from err
-        except NoSuchPathError as err:
-            raise RpcNoSuchPathError("Нет такого файла", path) from err
+        except AlgorithmError as err:
+            raise RpcAlgorithmExecError(err.msg)
 
     @jsonrpc_method(str, dict)
     async def algorithm_create(self, path, alg_dict):

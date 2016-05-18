@@ -36,10 +36,8 @@ class Executor:
 
         results = {}
 
-        for var in context.variables:
-            if var.startswith('@'):
-                results[var[1:]] = context.variables.get(var)
-
-        print(results)
+        for var in alg.output_spec:
+            if var in context.variables:
+                results[var] = context.variables.get(var)
 
         return results

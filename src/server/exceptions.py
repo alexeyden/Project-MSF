@@ -9,3 +9,8 @@ class RpcInvalidPathError(Error):
 class RpcNoSuchPathError(Error):
     def __init__(self, message, data=None):
         super().__init__(code=3, message=message, data=data)
+
+class RpcAlgorithmExecError(Error):
+    def __init__(self, message, data=None):
+        super().__init__(code=4, message=message, data=data)
+

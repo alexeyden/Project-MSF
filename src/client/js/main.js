@@ -80,7 +80,11 @@ function del_path() {
                     $("#add-dir-but a").addClass("disabled");
                 },
                 error: function(result) {
-                    alert(JSON.stringify(result.error));
+                    show_msg_ok_id({
+                        title : "Ошибка",
+                        text : "Невозможно удалить этот ресурс!",
+                        onOk : function() {}
+                    });
                 }
             });
         },
@@ -156,9 +160,16 @@ function save() {
     var do_save = function() {
         var cmd = !algorithm.is_new ? 'algorithm_update' : 'algorithm_create';
         $.jsonRPC.request(cmd, {
-                        params: [new_path, algorithm],
-                        id: server.token,
-                        success: function(result) {}
+            params: [new_path, algorithm],
+            id: server.token,
+            success: function(result) {},
+            error: function(result) {
+                show_msg_ok_id({
+                    title : "Ошибка",
+                    text : "Невозможно сохранить алгоритм по этому пути!",
+                    onOk : function() {}
+                });
+            }
         });
         if(algorithm.is_new)
             tree_view.update();
@@ -205,19 +216,22 @@ function exec() {
    if($('#run-but a').hasClass("disabled"))
     return;
 
-    if(!$('#edit-but a').hasClass("disabled")) {
-        if(!save())
-            return;
-    }
-
     var variables = {};
-    var text = "";
+    var output_spec = {};
 
     var filterFloat = function (value) {
-        if(/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/
+        if(/^(\-|\+)?([0-9]+(\.[0-9]+)?|Infinity)$/g
           .test(value))
           return Number(value);
       return NaN;
+    }
+
+    var filterName = function (value) {
+        return /[a-zA-Z_]+[0-9]*/g.test(value);
+    }
+
+    var filterNameList = function(value) {
+        return /[a-zA-Z_]+[0-9]*(,[\s]*[a-zA-Z_]+[0-9]*)*/g.test(value);
     }
 
     var nodes = myDiagram.model.nodeDataArray;
@@ -229,12 +243,21 @@ function exec() {
                 if(l.indexOf(":=") != -1) {
                     var parts = l.split(':=');
 
-                    if(!parts[0].trim().startsWith("@") && parts.length == 2 && !isNaN(filterFloat(parts[1].trim())))
+                    if(parts.length == 2 && filterName(parts[0].trim()) && !isNaN(filterFloat(parts[1].trim())))
                         variables[parts[0].trim()] = filterFloat(parts[1].trim());
                 }
             });
         }
+        if(n.category == 'Out') {
+            if(filterNameList(n.text.trim())) {
+                var parts = n.text.trim().split(',');
+                parts.forEach(function(p) {
+                    output_spec[p.trim()] = 0;
+                });
+            }
+        }
     });
+
     var template = '<tr>' +
                     '<td>{name} =</td>' +
                     '<td><input id="run_var_{name}" type="text" class="form_input" value="{value}"/>' +
@@ -248,58 +271,40 @@ function exec() {
         html += html_item;
     }
 
+    var has_output = Object.keys(output_spec).length > 0;
+
+    if(!has_output) {
+        show_msg_ok_id({title : "Ошибка",
+            text : "Отсутствуют выходные переменные! " +
+                    "Используйте блок \"Вывод\", чтобы указать выходные переменные.", onOk : function() {}
+         });
+        return;
+    }
+
     $('#popup-start-text').html(html);
 
-    var IsOutValue = false;
     show_msg_yesno_id({
         id : "#popup-start",
         onYes: function() {
-            nodes.forEach(function(n) {
-            if(n.category == "Act") {
-                var lines = n.text.split('\n');
-
-                lines.forEach(function(l) {
-                    if(l.indexOf(":=") != -1) {
-                        var parts = l.split(':=');
-                        if(parts[0].trim().startsWith("@")){
-                            IsOutValue = true;
-                            console.log("IsOutValue = " + IsOutValue);
-                        }
-                    }
-                });
-            }
-        });
-
             for (var v in variables) {
-                variables[v] = parseFloat($('#run_var_' + v).val());
-                console.log("!!!!!!" + v + "variables[v] = " + variables[v]);
-                source = myDiagram.model.nodeDataArray;
-                console.log(source);
-                if(isNaN(variables[v])){
-                    console.log('Ошибка: введено некорректное значение');
-                    var html = '';
+                variables[v] = filterFloat($('#run_var_' + v).val());
+
+                if(isNaN(variables[v])) {
                     show_msg_ok_id({
-                                    title : "Ошибка",
-                                    text : "Введено некорректное значение",
-                                    onOk : function() {}
+                        title : "Ошибка",
+                        text : "Некорректное значение переменной " + v,
+                        onOk : function() {}
                     });
-                return;
-                }
-                else if (IsOutValue == false){
-                    console.log('Ошибка: не заданна переменная для вывода');
-                    var html = '';
-                    show_msg_ok_id({
-                                    title : "Ошибка",
-                                    text : "Не заданна переменная для вывода(используйте @)",
-                                    onOk : function() {}
-                    });
-                return;
+
+                    return;
                 }
             }
-            console.log(algorithm.path);
-            console.log(variables);
+
             $.jsonRPC.request('algorithm_exec', {
-                params: [algorithm.path, variables],
+                params: [
+                    { input_spec: [], output_spec: Object.keys(output_spec), source:  myDiagram.model.toJson() },
+                    variables
+                ],
                 id: server.token,
 
                 success: function(result) {
@@ -307,17 +312,15 @@ function exec() {
 
                     for(var v in result.result)
                         html += v + " = " + result.result[v] + " <br/>";
-                        if(html == ''){
-                            html = "Возможно вы не определили переменную для вывода(используйте @)"
-                        }
-                    show_msg_ok_id({
-                                    title : "Результат",
-                                    text : html,
-                                    onOk : function() {}
-                                });
+
+                    show_msg_ok_id({title : "Результат", text : html, onOk : function() {}});
                 },
                 error: function(result) {
-                    console.log('Ошибка: ' + JSON.stringify(result.error))
+                    show_msg_ok_id({
+                        title : "Ошибка исполнения",
+                        text : result.error.message.replace('\n', '<br/>'),
+                        onOk : function() {}
+                    });
                 }
             });
         },
@@ -348,7 +351,7 @@ function rename_dir() {
                             if(result.error.code == 2) {
                                 show_msg_ok_id({
                                     title : "Ошибка",
-                                    text : "Новое имя некорректно",
+                                    text : "Переименование невозможно.",
                                     onOk : function() {}
                                 });
                             } else {
@@ -409,7 +412,7 @@ function show_msg_ok_id(params) {
 
     var $draggable = $(params.id).draggabilly({
       containment: 'body',
-      handle: '.popup-window'
+      handle: '.popup-title'
     })
 
     if(params.id == '#popup-msg-ok') {

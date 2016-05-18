@@ -1,19 +1,35 @@
-import json
+import time
 
 from .algorithm import *
+from .eval_op import *
 from .eval_op import Evaluator as BlockEvaluator
-
+from .exceptions import *
 
 class Node:
     START = 1
     OP = 2
     IF = 3
     END = 4
+    OUT = 5
 
     def __init__(self, kind, op, children=[]):
         self.kind = kind
         self.op = op
         self.children = children
+
+    def __str__(self):
+        name_dict = {
+            self.START: "Начало",
+            self.OP: "Действие",
+            self.IF: "Условие",
+            self.END: "Конец",
+            self.OUT: "Вывод"
+        }
+
+        if self.kind == self.START or self.kind == self.END:
+            return name_dict[self.kind]
+
+        return name_dict[self.kind] + ": " + self.op.replace('\n', '; ')
 
 
 class EvalContext:
@@ -31,14 +47,30 @@ class NodeEval:
     def next(self):
         ret = self._eval()
 
-        # TODO: verify graph structure
-
         if self.node.kind == self.node.START:
+            if len(self.node.children) == 0:
+                raise GraphConnectivityError('Блок "{0}" не связан с другими блоками!'.format(self.node), str(self.node))
+
             self.node = self.node.children[0]
+
         elif self.node.kind == self.node.OP:
+            if len(self.node.children) == 0:
+                raise GraphConnectivityError('Блок "{0}" не связан с другими блоками!'.format(self.node), str(self.node))
+
             self.node = self.node.children[0]
+
         elif self.node.kind == self.node.IF:
+            if len(self.node.children) < 2:
+                raise GraphConnectivityError('Блок "{0}" не связан с другими блоками!'.format(self.node), str(self.node))
+
             self.node = self.node.children[int(ret)]
+
+        elif self.node.kind == self.node.OUT:
+            if len(self.node.children) == 0:
+                raise GraphConnectivityError('Блок "{0}" не связан с другими блоками!'.format(self.node), str(self.node))
+
+            self.node = self.node.children[0]
+
         elif self.node.kind == self.node.END:
             return False
 
@@ -50,7 +82,18 @@ class NodeEval:
             ev = BlockEvaluator(self.context.variables, self.context.functions)
 
             for op in ops:
-                name, val = ev.eval(op)
+                try:
+                    name, val = ev.eval(op)
+                except ParseError as err:
+                    msg = "Синтаксическая ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                    raise BlockSyntaxError(msg, str(self.node), err.position) from err
+                except NotDefinedError as err:
+                    msg = "Ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                    raise BlockSymbolError(msg, str(self.node), err.symbol, err.position) from err
+                except MathError as err:
+                    msg = "Ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                    raise BlockEvalError(msg, str(self.node)) from err
+
                 if name not in self.context.readonly:
                     self.context.variables[name] = val
 
@@ -59,7 +102,17 @@ class NodeEval:
 
             ev = BlockEvaluator(self.context.variables, self.context.functions)
 
-            res = ev.eval(op)
+            try:
+                res = ev.eval(op)
+            except ParseError as err:
+                msg = "Синтаксическая ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                raise BlockSyntaxError(msg, str(self.node), err.position) from err
+            except NotDefinedError as err:
+                msg = "Ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                raise BlockSymbolError(msg, str(self.node), err.symbol, err.position) from err
+            except MathError as err:
+                msg = "Ошибка в блоке {0}: \n{1}".format(self.node, err.msg)
+                raise BlockEvalError(msg, str(self.node)) from err
 
             return res > 0
 
@@ -67,8 +120,12 @@ class NodeEval:
 class Evaluator:
     def __init__(self, source, context):
         self.context = context
+        self.timeout = 10.0
 
-        data = json.loads(source)
+        try:
+            data = json.loads(source)
+        except json.JSONDecodeError as err:
+            raise AlgorithmParseError(err.msg)
 
         nodes = dict()
 
@@ -99,8 +156,15 @@ class Evaluator:
     def eval(self):
         ev = NodeEval(self._start, self.context)
 
+        start_time = time.time()
+
         while ev.next():
-            pass
+            cur_time = time.time()
+
+            if (cur_time - start_time) > self.timeout:
+                raise GraphTimeoutError(
+                    "Превышено время исполнения алгоритма ({0:.1f} сек). "
+                    "Возможно алгоритм содержит бесконечный цикл.".format(self.timeout), self.timeout)
 
     @staticmethod
     def _classify(node):
@@ -110,5 +174,7 @@ class Evaluator:
             return Node.END
         elif 'figure' in node and node['figure'] == 'Diamond':
             return Node.IF
+        elif 'category' in node and node['category'] == 'Out':
+            return Node.OUT
         else:
             return Node.OP

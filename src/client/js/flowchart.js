@@ -105,27 +105,40 @@ function init() {
                     ),
                     makePort("B", go.Spot.Bottom, true, false)
             ));
-     myDiagram.nodeTemplateMap.add("Cond",
+    myDiagram.nodeTemplateMap.add("Cond",
+    $(go.Node, "Spot", nodeStyle(),
+            $(go.Panel, "Auto",
+                    $(go.Shape, "Rectangle",
+                                {fill: "#dc4a81", stroke: null},
+                                new go.Binding("figure", "figure")),
+                    $(go.TextBlock,
+                                {
+                                    font: "bold 10pt Helvetica, Arial, sans-serif",
+                                    stroke: lightText,
+                                    margin: 8,
+                                    maxSize: new go.Size(160, NaN),
+                                    wrap: go.TextBlock.WrapFit,
+                                    editable: true,
+                                    stroke: '#fff'
+                                },
+                                new go.Binding("text").makeTwoWay())
+            ),
+            makePort("T", go.Spot.Top, false, true),
+            makePort("L", go.Spot.Left, true, false),
+            makePort("R", go.Spot.Right, true, false)
+    ));
+    myDiagram.nodeTemplateMap.add("Out",
         $(go.Node, "Spot", nodeStyle(),
                 $(go.Panel, "Auto",
-                        $(go.Shape, "Rectangle",
-                                    {fill: "#dc4a81", stroke: null},
-                                    new go.Binding("figure", "figure")),
+                        $(go.Shape, "Output",
+                                {minSize: new go.Size(100, 40), fill: "#21C47E", stroke: null}),
                         $(go.TextBlock,
-                                    {
-                                        font: "bold 10pt Helvetica, Arial, sans-serif",
-                                        stroke: lightText,
-                                        margin: 8,
-                                        maxSize: new go.Size(160, NaN),
-                                        wrap: go.TextBlock.WrapFit,
-                                        editable: true,
-                                        stroke: '#fff'
-                                    },
-                                    new go.Binding("text").makeTwoWay())
+                                {textAlign: "center", font: "bold 10pt Helvetica, Arial, sans-serif", stroke: lightText, editable: true},
+                                new go.Binding("text").makeTwoWay())
                 ),
+                // four named ports, one on each side:
                 makePort("T", go.Spot.Top, false, true),
-                makePort("L", go.Spot.Left, true, false),
-                makePort("R", go.Spot.Right, true, false)
+                makePort("B", go.Spot.Bottom, true, false)
         ));
     myDiagram.nodeTemplateMap.add("End",
             $(go.Node, "Spot", nodeStyle(),
@@ -215,6 +228,7 @@ function init() {
                         model: new go.GraphLinksModel([  // specify the contents of the Palette
                             {category: "Act", text: "Действие"},
                             {category: "Cond", text: "Условие", figure: "Diamond" },
+                            {category: "Out", text: "Вывод"},
                             {category: "End", text: "Конец"},
                             {category: "Comment", text: "Комментарий"}
                         ])
