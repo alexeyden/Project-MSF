@@ -111,11 +111,12 @@ body
     min-width: 10em;
 }
 
-#popup-start-text {
+.popup-start-text {
     width: 100%;
 }
-#popup-start-text tr td:first-child {
+.popup-start-text tr td:first-child {
     text-align: right;
+		min-width: 20%;
 }
 
 .popup-title {

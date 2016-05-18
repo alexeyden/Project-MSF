@@ -281,7 +281,7 @@ function exec() {
         return;
     }
 
-    $('#popup-start-text').html(html);
+    $('#popup-start-var-text').html(html);
 
     $("#popup-start .popup-preloader").hide();
     $("#popup-start .popup-modal-yes").removeClass("disabled");
@@ -321,9 +321,15 @@ function exec() {
 
                 success: function(result) {
                     var html = '';
+										var template = '<tr>' +
+																		'<td>{name} =</td>' +
+																		'<td>{value} </td></tr>';
 
-                    for(var v in result.result)
-                        html += v + " = " + result.result[v] + " <br/>";
+                    for(var v in result.result) {
+												var item = template.replace("{name}", v);
+												item = item.replace("{value}", result.result[v].toFixed(3));
+                        html +=item;
+										}
 
                     $("#popup-start-result").show();
                     $("#popup-start-result-text").html(html);
@@ -392,7 +398,8 @@ function show_msg_yesno_id(params) {
         },
         closeOnBgClick: false,
         showCloseBtn: false,
-        enableEscapeKey: false
+        enableEscapeKey: false,
+				modal: true
     });
 
     var $draggable = $(params.id).draggabilly({
