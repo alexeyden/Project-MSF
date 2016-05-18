@@ -283,13 +283,25 @@ function exec() {
 
     $('#popup-start-text').html(html);
 
-    show_msg_yesno_id({
+    $("#popup-start .popup-preloader").hide();
+    $("#popup-start .popup-modal-yes").removeClass("disabled");
+    $("#popup-start .popup-modal-no").removeClass("disabled");
+
+    $("#popup-start-result").hide();
+
+    var popup = show_msg_yesno_id({
         id : "#popup-start",
         onYes: function() {
+            $("#popup-start .popup-preloader").show();
+            $("#popup-start .popup-modal-yes").addClass("disabled");
+            $("#popup-start .popup-modal-no").addClass("disabled");
+
             for (var v in variables) {
                 variables[v] = filterFloat($('#run_var_' + v).val());
 
                 if(isNaN(variables[v])) {
+                    popup.close();
+
                     show_msg_ok_id({
                         title : "Ошибка",
                         text : "Некорректное значение переменной " + v,
@@ -313,9 +325,15 @@ function exec() {
                     for(var v in result.result)
                         html += v + " = " + result.result[v] + " <br/>";
 
-                    show_msg_ok_id({title : "Результат", text : html, onOk : function() {}});
+                    $("#popup-start-result").show();
+                    $("#popup-start-result-text").html(html);
+                    $("#popup-start .popup-preloader").hide();
+                    $("#popup-start .popup-modal-yes").removeClass("disabled");
+                    $("#popup-start .popup-modal-no").removeClass("disabled");
                 },
                 error: function(result) {
+                    popup.close();
+
                     show_msg_ok_id({
                         title : "Ошибка исполнения",
                         text : result.error.message.replace('\n', '<br/>'),
@@ -324,11 +342,10 @@ function exec() {
                 }
             });
         },
+        dontClose : true,
         onNo: function() {}
     });
 }
-
-
 
 function rename_dir() {
     if(!$('#edit-dir a').hasClass("disabled")) {
@@ -372,7 +389,10 @@ function show_msg_yesno_id(params) {
         items: {
             type: 'inline',
             src: params.id
-        }
+        },
+        closeOnBgClick: false,
+        showCloseBtn: false,
+        enableEscapeKey: false
     });
 
     var $draggable = $(params.id).draggabilly({
@@ -385,18 +405,35 @@ function show_msg_yesno_id(params) {
 
     $(document).on('click', params.id + ' .popup-modal-yes', function (e) {
         e.preventDefault();
-        $.magnificPopup.close();
-        $draggable.draggabilly('destroy');
+
+        if($(params.id + ' .popup-modal-yes').hasClass("disabled"))
+            return;
+
+        if(!('dontClose' in params)) {
+            $.magnificPopup.close();
+            $draggable.draggabilly('destroy');
+        }
 
         params.onYes();
     });
     $(document).on('click', params.id + ' .popup-modal-no', function (e) {
         e.preventDefault();
+
+        if($(params.id + ' .popup-modal-no').hasClass("disabled"))
+            return;
+
         $.magnificPopup.close();
         $draggable.draggabilly('destroy');
 
         params.onNo();
     });
+
+    return {
+        close: function() {
+            $.magnificPopup.close();
+            $draggable.draggabilly('destroy');
+        }
+    }
 }
 
 function show_msg_ok_id(params) {

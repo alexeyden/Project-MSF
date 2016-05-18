@@ -122,6 +122,21 @@ body
     cursor: pointer;
 }
 
+.popup-preloader {
+    height: 1em;
+    padding: 4px;
+}
+
+.popup-preloader img {
+    float: left;
+    margin-right: 2px;
+}
+
+.popup-preloader span {
+    float: left;
+    padding: 4px;
+}
+
 .MainWindow{
     position:relative;
     max-width: 1200px;
@@ -178,13 +193,14 @@ body
 
 #myPaletteDiv{
     position: relative;
-    width:20%;
+    width:22%;
     float: left;
     height: calc(100% - 2em - 5px);
     overflow: hidden;
 }
 #panel_flowchart {
     height: 100%;
+    overflow: hidden;
 }
 
 .alg_title {
@@ -198,7 +214,7 @@ body
 
 #algorithm_info {
     float: right;
-    width: calc(78% - 5px);
+    width: calc(76% - 5px);
     height: 2em;
     clear: right;
     margin: 0px;
@@ -214,7 +230,7 @@ body
     position: relative;
     background: #fff;
     border-bottom: 4px solid #14142a;
-    width:78%;
+    width:76%;
     height: calc(100% - 2em - 5px);
     float: right;
     margin: 0px;
