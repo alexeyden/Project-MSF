@@ -374,6 +374,7 @@ input#algorithm_info:hover::after,
     font-size: 12pt;
     padding: 4px 8px;
     color: #333;
+		text-shadow: none;
     position: absolute;
     right: 10px;
     top: 35px;
@@ -397,6 +398,7 @@ ul#sliding-navigation li.sliding-element:hover::after {
     font-family: Days, sans-serif;
     font-size: 1em;
     padding: 4px 8px;
+		text-shadow: none;
     color: #333;
     position: absolute;
     left: 1%;
