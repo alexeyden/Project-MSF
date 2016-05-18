@@ -15,6 +15,11 @@ function init() {
                             }
                         }
                     });
+
+    myDiagram.grid.visible = true;
+    myDiagram.toolManager.draggingTool.isGridSnapEnabled = true;
+    myDiagram.toolManager.resizingTool.isGridSnapEnabled = true;
+
     myDiagram.addDiagramListener("Modified", function(e) {
       if(myDiagram.isModified || !myDiagram.isModified && model_reload) {
         if(!myDiagram.isModified && model_reload)
