@@ -1,6 +1,8 @@
 .idea
 *.pyc
 __pycache__
+deploy/dist
+deploy/build
 src/tests/storage/*
 !src/tests/storage/roles.json
 !src/tests/storage/users.json
