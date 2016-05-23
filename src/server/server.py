@@ -38,13 +38,13 @@ class Authenticator:
 
 
 class Server:    
-    def __init__(self, data_path, debug=False):
+    def __init__(self, data_path, client_path='../client', debug=False):
         self._app = web.Application()
         self._app.router.add_route('POST', '/api', self._api_handler)
         self._app.router.add_route('GET', '/{path:.*}', self._web_handler)
 
         #self._app.router.add_static('/', '../client')
-
+        self.client_data = client_path
         self.storage = Storage(storage_path=data_path)
         self.executor = Executor()
 
@@ -207,7 +207,7 @@ class Server:
         if path == '/':
             path = '/index.html'
 
-        content_root = '../client'
+        content_root = self.client_data
         if self._debug:
             print('GET static file: ' + content_root + path)
 
@@ -239,6 +239,7 @@ class Server:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--data', help='data storage path', default='data', metavar='DATA_PATH')
+    parser.add_argument('-e', '--client-data', help='web client path', default='../client', metavar='CLIENT_PATH')
     parser.add_argument('-v', '--verbose', help='print debug messages', action='store_true')
     parser.add_argument('-l', '--listen', help='listening host', default='', metavar='HOST')
     parser.add_argument('-p', '--port', help='listening port', default=8080, type=int)
@@ -252,7 +253,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        server = Server(data_path=args.data, debug=args.verbose)
+        server = Server(data_path=args.data, debug=args.verbose, client_path=args.client_data)
     except ConfigError as error:
         print('Config Error ({1}):\n\t{0}'.format(*error.args), file=sys.stderr)
 
