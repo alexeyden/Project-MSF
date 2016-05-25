@@ -3,6 +3,7 @@
 __pycache__
 deploy/dist
 deploy/build
+deploy/win_installer
 src/tests/storage/*
 !src/tests/storage/roles.json
 !src/tests/storage/users.json

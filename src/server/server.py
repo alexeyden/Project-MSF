@@ -4,6 +4,7 @@ import argparse
 import sys
 import os
 import time
+import mimetypes
 
 from aiohttp import web
 from util import jsonrpc
@@ -75,7 +76,6 @@ class Server:
         try:
             contents = self.storage.list(path, context, recursive=recursive)
             result = [item.to_dict() for item in contents]
-            print(result)
             self._log("return: items: {0}".format(", ".join([item.name for item in contents])))
 
             return result
@@ -216,8 +216,10 @@ class Server:
                 resp = f.read()
         else:
             raise web.HTTPNotFound()
+	
+        mimetype,_ = mimetypes.guess_type(content_root + path)
 
-        return web.Response(body=resp)
+        return web.Response(body=resp, content_type = mimetype if mimetype else 'application/octet-stream')
 
     async def _api_handler(self, request):
         text = await request.text()

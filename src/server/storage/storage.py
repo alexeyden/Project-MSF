@@ -86,7 +86,6 @@ class Storage:
         for item in contents:
             if path == '/' and self.owner(self._path_join(path, item)) is None:
                 continue
-
             if self.exists(self._path_join(path, item), context):
                 item_path = self._path_join(path, item)
                 result.append(self.file_info(item_path, context))
@@ -269,7 +268,6 @@ class Storage:
             user, *parts = self._path_split(path)
             if user != context.user:
                 role = self.roles.by_path(path)
-
                 if role and context.user in role.users:
                     return True
 

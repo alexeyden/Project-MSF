@@ -23,7 +23,7 @@ class RoleAccess:
                 'Config file not found: {0}'.format(self.config_path),
                 self.config_path)
 
-        with open(self.config_path, 'r') as file:
+        with open(self.config_path, 'r', encoding='utf-8') as file:
             try:
                 config = json.load(file)
             except json.JSONDecodeError as error:
